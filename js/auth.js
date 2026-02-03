@@ -1,6 +1,6 @@
 window.USERS = {
     common: {
-        commands: ['help', 'ls', 'about', 'logout'],
+        commands: ['help', 'ls', 'about', 'logout', 'clear', "batman"],
         files: []
     },
     benjamin: {
@@ -8,7 +8,7 @@ window.USERS = {
         files: ['terminal-site', 'notes.txt']
     },
     lucas: {
-        commands: ['help', "slap"],
+        commands: ["slap"],
         files: ['projects', 'todo.txt']
     }
 };

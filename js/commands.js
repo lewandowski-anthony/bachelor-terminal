@@ -34,6 +34,10 @@ const COMMANDS = {
     term.writeln('Le patrimoine de Lucas a été slapé !');
     const weddingDate = new Date(2026, 9, 19, 12, 0, 0);
     weddingCountdown(term, promptText, weddingDate);
+  },
+  batman() {
+    term.writeln('Redirection vers les archives de Gotham...');
+    window.open('https://www.youtube.com/shorts/d-l-0StxE3o', '_blank');
   }
 };
 
