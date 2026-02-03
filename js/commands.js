@@ -6,6 +6,10 @@ const COMMANDS = {
   about() {
     term.writeln('Terminal web avec users custom 😎');
   },
+  clear() {
+    term.clear();
+    term.write(promptText);
+  },
   ls() {
     term.writeln('List of available files:');
     auth.files.forEach(file => term.writeln(`- ${file}`));
