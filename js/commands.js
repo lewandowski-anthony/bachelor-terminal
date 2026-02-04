@@ -59,7 +59,6 @@ const COMMANDS = {
       auth.commands = [];
       promptText = 'login: ';
       term.writeln('\nLogged out.\n');
-      term.write(promptText);
     },
     desc: 'Log out the user'
   },

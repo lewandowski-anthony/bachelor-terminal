@@ -1,3 +1,6 @@
+
+let numberOfAttempts = 0;
+
 window.term = new Terminal({
   cursorBlink: true,
   theme: {
@@ -26,8 +29,12 @@ term.onKey(e => {
     if (auth.state === 'shell') {
       window.executeCommand(input);
       term.write('\r\n' + promptText);
-    } else {
-      handleAuthInput(input);
+    } 
+    else if (auth.state === 'password') {
+      numberOfAttempts = handleAuthPasswordInput(input, numberOfAttempts);
+    }
+    else {
+      handleAuthLoginInput(input);
       if (auth.state === 'shell') {
         term.write('\r\n' + promptText);
       }
