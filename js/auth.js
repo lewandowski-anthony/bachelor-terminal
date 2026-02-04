@@ -1,23 +1,38 @@
 const MAX_PASSWORD_ATTEMPTS = 3;
 
 window.USERS = {
-    common: {
-        commands: ['help', 'about', 'logout', 'clear']
-    },
     benjamin: {
-        commands: ['projects', 'bzbomb', "files"]
+        role: "admin",
+        commands: ['bzbomb']
     },
     lucas: {
-        commands: ["slap", "files"]
+        role: "user",
+        commands: ['slap']
     },
     torio: {
-        commands: ["users"]
+        role: "user"
     },
     anthony: {
-        commands: ["users"],
+        role: "admin",
         password: 'evg2026'
     }
 };
+
+window.ROLES = {
+    admin: {
+        level: 0,
+        commands: ['logs']
+    },
+    user: {
+        level: 1,
+        commands: ['files']
+    },
+    guest: {
+        level: 2,
+        commands: ['help', 'about', 'logout', 'clear']
+    }
+};
+
 
 window.auth = {
     state: 'login',
@@ -25,27 +40,40 @@ window.auth = {
     commands: []
 };
 
+function getCommandsForUser(username) {
+    const user = USERS[username];
+    if (!user) return [];
+
+    const userRole = user.role;
+    const userCommands = user.commands || [];
+    const userLevel = ROLES[userRole]?.level ?? Infinity;
+
+    const inheritedRoles = Object.entries(ROLES)
+        .filter(([roleName, roleData]) => roleData.level >= userLevel)
+        .map(([roleName, roleData]) => roleData.commands || []);
+
+    const commands = inheritedRoles.flat().concat(userCommands);
+    return Array.from(new Set(commands));
+}
+
 
 window.handleAuthLoginInput = function (input) {
 
     const username = input.trim() || 'guest';
 
-    if (!USERS.hasOwnProperty(username) || username === 'common') {
+    if (!USERS.hasOwnProperty(username)) {
         term.writeln(`Unknown user: ${username}`);
         term.write(promptText);
         return;
     }
 
     auth.username = username;
-    auth.commands = USERS['common'].commands.concat(USERS[username]?.commands || []);
+    auth.commands = getCommandsForUser(username);
     auth.state = 'shell';
-    window.promptText = `${username}@evg-2026-server:~$ `;
 
     if (USERS[username].hasOwnProperty('password')) {
         auth.state = 'password';
-        window.promptText = `${username}@evg-2026-server:~$password: `;
     }
-    term.write('\r\n' + promptText);
 };
 
 window.handleAuthPasswordInput = function (input, numberOfAttempts) {
@@ -60,16 +88,10 @@ window.handleAuthPasswordInput = function (input, numberOfAttempts) {
             auth.state = 'login';
             auth.username = '';
             auth.commands = [];
-            window.promptText = 'login: ';
             numberOfAttempts=0
-        } else {
-            window.promptText = `${auth.username}@evg-2026-server:~$password: `;
         }
-        term.write('\r\n' + promptText);
         return numberOfAttempts;
     }
     term.write('\r\n' + `Correct password. Welcome, ${auth.username}!\r\n`);
-    window.promptText = `${auth.username}@evg-2026-server:~`;
     auth.state = 'shell';
-    term.write('\r\n' + promptText);
 };

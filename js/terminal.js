@@ -1,11 +1,19 @@
 
 let numberOfAttempts = 0;
 
+const SERVER_NAME = 'evg-2026-server';
+const PASSWORD_LINE = 'password:';
+
 window.term = new Terminal({
   cursorBlink: true,
+  cursorStyle: 'block',
+  cursorBlink: true,
+  fontFamily: '"Courier New", monospace',
+  fontSize: 22,
   theme: {
-    background: '#000',
-    foreground: '#00ff00'
+    background: '#000000',
+    foreground: '#00ff00',
+    cursor: '#00ff00'
   }
 });
 
@@ -20,15 +28,14 @@ let input = '';
 term.write(promptText);
 
 term.onKey(e => {
-  const ev = e.domEvent;
+  const event = e.domEvent;
   const key = e.key;
 
-  if (ev.key === 'Enter') {
+  if (event.key === 'Enter') {
     term.write('\r\n');
 
     if (auth.state === 'shell') {
       window.executeCommand(input);
-      term.write('\r\n' + promptText);
     } 
     else if (auth.state === 'password') {
       numberOfAttempts = handleAuthPasswordInput(input, numberOfAttempts);
@@ -36,21 +43,21 @@ term.onKey(e => {
     else {
       handleAuthLoginInput(input);
       if (auth.state === 'shell') {
-        term.write('\r\n' + promptText);
       }
     }
-
+    window.promptText = auth.state === 'login' ? 'login: ' : auth.state === 'password' ? `${PASSWORD_LINE}` : `${auth.username}@${SERVER_NAME}:~$ `;
+    term.write(promptText);
     input = '';
   }
 
-  else if (ev.key === 'Backspace') {
+  else if (event.key === 'Backspace') {
     if (input.length > 0) {
       input = input.slice(0, -1);
       term.write('\b \b');
     }
   }
 
-  else if (!ev.ctrlKey && !ev.metaKey && ev.key.length === 1) {
+  else if (!event.ctrlKey && !event.metaKey && event.key.length === 1) {
     input += key;
     term.write(key);
   }
