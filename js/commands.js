@@ -120,11 +120,17 @@ const COMMANDS = {
 
         term.writeln(`Opening ${file.name} (${file.type}) ...`);
 
-        if (file.type === 'video' || file.type === 'text') {
+        if (file.type === 'video') {
           window.open(atob(file.data), '_blank');
         } else if (file.type === 'image') {
           const imgWindow = window.open('');
           imgWindow.document.write(`<img src="${atob(file.data)}" style="max-width:100%;height:auto;">`);
+        } 
+        else if (file.type === 'text') {
+          const text = atob(file.data);
+          term.writeln('--- ' + file.name + ' ---');
+          text.split('\n').forEach(line => term.writeln(line));
+          term.writeln('--- End of ' + file.name + ' ---');
         }
       } else {
         term.writeln('Unknown subcommand. Use list or open.');
