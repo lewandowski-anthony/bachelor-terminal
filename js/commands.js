@@ -42,6 +42,12 @@ const COMMANDS = {
   batman() {
     term.writeln('Redirection vers les archives de Gotham...');
     window.open('https://www.youtube.com/shorts/d-l-0StxE3o', '_blank');
+  },
+  pickle() {
+    window.open('https://www.youtube.com/shorts/zPrRfZfgQ2Y', '_blank');
+  },
+  admin() {
+    window.open('https://www.youtube.com/watch?v=cY-OClvfzk8', '_blank');
   }
 };
 

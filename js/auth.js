@@ -1,6 +1,6 @@
 window.USERS = {
     common: {
-        commands: ['help', 'ls', 'about', 'logout', 'clear', "batman"],
+        commands: ['help', 'ls', 'about', 'logout', 'clear', "batman", "pickle", "admin"],
         files: []
     },
     benjamin: {
