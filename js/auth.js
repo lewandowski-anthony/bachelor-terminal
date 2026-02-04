@@ -1,15 +1,15 @@
 window.USERS = {
     common: {
-        commands: ['help', 'ls', 'about', 'logout', 'clear', "batman", "pickle", "admin"],
-        files: []
+        commands: ['help', 'about', 'logout', 'clear']
     },
     benjamin: {
-        commands: ['projects', 'bzbomb'],
-        files: ['terminal-site', 'notes.txt']
+        commands: ['projects', 'bzbomb', "files"]
     },
     lucas: {
-        commands: ["slap"],
-        files: ['projects', 'todo.txt']
+        commands: ["slap", "files"]
+    },
+    torio: {
+        commands: ["users"]
     }
 };
 
@@ -17,8 +17,7 @@ window.USERS = {
 window.auth = {
     state: 'login',
     username: '',
-    commands: [],
-    files: []
+    commands: []
 };
 
 window.handleAuthInput = function (input) {
@@ -26,16 +25,15 @@ window.handleAuthInput = function (input) {
     const username = input.trim() || 'guest';
 
     if(!USERS.hasOwnProperty(username) || username === 'common') {
-        term.writeln(`Utilisateur inconnu : ${username}`);
+        term.writeln(`Unknown user: ${username}`);
         term.write(promptText);
         return;
     }
 
     auth.username = username;
     auth.commands = USERS['common'].commands.concat(USERS[username]?.commands || []);
-    auth.files = USERS['common'].files.concat(USERS[username]?.files || []);
     auth.state = 'shell';
 
-    window.promptText = `${username}@site:~$ `;
-    term.writeln(`Bienvenue ${username}`);
+    window.promptText = `${username}@evg-2026-server:~$ `;
+    term.writeln(`Welcome ${username}`);
 };

@@ -34,7 +34,7 @@ window.weddingCountdown = (term, promptText, weddingDate) => {
       const seconds = totalSeconds % minutesPerHour;
 
       const countdown = `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s`;
-      term.write(`\r${countdown}`);
+      term.write(clearLine(countdown));
     }, 1000);
 
     const keyListener = term.onKey(e => {
@@ -44,3 +44,7 @@ window.weddingCountdown = (term, promptText, weddingDate) => {
       }
     });
 }
+
+const clearLine = str => {
+  return '\r' + str + ' '.repeat(80 - str.length);
+};
