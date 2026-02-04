@@ -76,7 +76,7 @@ const COMMANDS = {
       }
       const sub = args[0].toLowerCase();
       if (sub === 'list') {
-        
+
         const sortedLogs = [...window.logList].sort((a, b) => new Date(b.date) - new Date(a.date));
         term.writeln(
           pad('id', S_SIZE_WIDTH) +
@@ -85,13 +85,13 @@ const COMMANDS = {
         );
         term.writeln('-'.repeat(M_SIZE_WIDTH + S_SIZE_WIDTH + S_SIZE_WIDTH));
         sortedLogs
-        .forEach(log => {
-          term.writeln(
-            pad(log.id, S_SIZE_WIDTH) +
-            pad(log.creator, S_SIZE_WIDTH) +
-            pad(log.date, M_SIZE_WIDTH)
-          )
-        });
+          .forEach(log => {
+            term.writeln(
+              pad(log.id, S_SIZE_WIDTH) +
+              pad(log.creator, S_SIZE_WIDTH) +
+              pad(log.date, M_SIZE_WIDTH)
+            )
+          });
       } else if (sub === 'open') {
         const id = args[1];
 
@@ -105,7 +105,7 @@ const COMMANDS = {
           term.writeln(`Log not found: ${id}`);
           return;
         }
-        if(log.creator !== auth.username && auth.role !== 'admin') {
+        if (log.creator !== auth.username && auth.role !== 'admin') {
           term.writeln(`You don't have permission to access this log.`);
           return;
         }
@@ -127,20 +127,16 @@ const COMMANDS = {
 
       const sub = args[0].toLowerCase();
       if (sub === 'list') {
-        const sorted = [...window.fileList].sort((a, b) => a.type.localeCompare(b.type));
-
-        term.writeln(
-          pad('File Name', M_SIZE_WIDTH) +
-          pad('Type', S_SIZE_WIDTH) +
-          pad('Status', S_SIZE_WIDTH)
-        );
-        term.writeln('-'.repeat(M_SIZE_WIDTH + S_SIZE_WIDTH + S_SIZE_WIDTH));
-        sorted.forEach(f => {
-          term.writeln(
-            pad(f.name, M_SIZE_WIDTH) +
-            pad(f.type, S_SIZE_WIDTH) +
-            pad(f.password ? 'protected' : 'public', S_SIZE_WIDTH)
-          );
+        return new Promise(resolve => {
+          withLoading(term, 'Loading files...', () => {
+            const sorted = [...window.fileList].sort((a, b) => a.type.localeCompare(b.type));
+            term.writeln(pad('File Name', 25) + pad('Type', 10) + pad('Status', 10));
+            term.writeln('-'.repeat(45));
+            sorted.forEach(f => {
+              term.writeln(pad(f.name, 25) + pad(f.type, 10) + pad(f.password ? 'protected' : 'public', 10));
+            });
+            resolve();
+          });
         });
       } else if (sub === 'open') {
         const name = args[1];
@@ -181,9 +177,9 @@ const COMMANDS = {
 window.COMMANDS = COMMANDS;
 
 
-window.executeCommand = function (input) {
+window.executeCommand = async function (input) {
   const parts = input.trim().split(/\s+/);
-  const cmd = parts.shift().toLowerCase();
+  const cmd = parts.shift()?.toLowerCase();
   const args = parts;
 
   if (!cmd) return;
@@ -193,6 +189,10 @@ window.executeCommand = function (input) {
     return;
   }
 
-  window.COMMANDS[cmd]?.fn(args);
+  const command = window.COMMANDS[cmd];
+  if (!command) return;
+
+  await command.fn(args);
 };
+
 

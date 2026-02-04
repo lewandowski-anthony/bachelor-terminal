@@ -14,11 +14,11 @@ window.USERS = {
     },
     antoine: {
         role: "superuser",
-        password: 'antoine2026'
+        password: 'YW50b2luZTIwMjY='
     },
     anthony: {
         role: "admin",
-        password: 'evg2026'
+        password: 'ZXZnMjAyNg=='
     }
 };
 
@@ -90,7 +90,7 @@ window.handleAuthPasswordInput = function (input, numberOfAttempts) {
 
     const inputPassword = input.trim();
 
-    if (inputPassword !== USERS[auth.username].password) {
+    if (btoa(inputPassword) !== USERS[auth.username].password) {
         term.writeln('Incorrect password.');
         numberOfAttempts++;
         if (numberOfAttempts >= MAX_PASSWORD_ATTEMPTS) {

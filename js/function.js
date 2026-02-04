@@ -55,3 +55,27 @@ function pad(str, width) {
   if (str.length > width - 1) return str.slice(0, width - 1) + '…';
   return str + ' '.repeat(width - str.length);
 }
+
+function withLoading(term, message, action) {
+  const totalSteps = 20;
+  let currentStep = 0;
+
+  term.write(message + ' [' + ' '.repeat(totalSteps) + ']');
+
+  const interval = setInterval(() => {
+    currentStep++;
+    if (currentStep > totalSteps) currentStep = totalSteps;
+
+    const filled = '█'.repeat(currentStep);
+    const empty = ' '.repeat(totalSteps - currentStep);
+
+    term.write('\r' + message + ' [' + filled + empty + ']');
+
+    if (currentStep === totalSteps) {
+      clearInterval(interval);
+      term.write('\r\n');
+      action();
+      term.write('\r\n' + promptText);
+    }
+  }, 100 + Math.random() * 100);
+}

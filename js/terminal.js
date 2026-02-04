@@ -27,7 +27,7 @@ let input = '';
 
 term.write(promptText);
 
-term.onKey(e => {
+term.onKey(async e => {
   const event = e.domEvent;
   const key = e.key;
 
@@ -35,15 +35,13 @@ term.onKey(e => {
     term.write('\r\n');
 
     if (auth.state === 'shell') {
-      window.executeCommand(input);
+      await window.executeCommand(input);
     } 
     else if (auth.state === 'password') {
       numberOfAttempts = handleAuthPasswordInput(input, numberOfAttempts);
     }
     else {
       handleAuthLoginInput(input);
-      if (auth.state === 'shell') {
-      }
     }
     window.promptText = auth.state === 'login' ? 'login: ' : auth.state === 'password' ? `${PASSWORD_LINE}` : `${auth.username}@${SERVER_NAME}:~$ `;
     term.write(promptText);
