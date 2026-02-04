@@ -48,3 +48,10 @@ window.weddingCountdown = (term, promptText, weddingDate) => {
 const clearLine = str => {
   return '\r' + str + ' '.repeat(80 - str.length);
 };
+
+
+function pad(str, width) {
+  str = String(str ?? '');
+  if (str.length > width - 1) return str.slice(0, width - 1) + '…';
+  return str + ' '.repeat(width - str.length);
+}

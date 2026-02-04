@@ -9,7 +9,7 @@ window.term = new Terminal({
   cursorStyle: 'block',
   cursorBlink: true,
   fontFamily: '"Courier New", monospace',
-  fontSize: 22,
+  fontSize: 15,
   theme: {
     background: '#000000',
     foreground: '#00ff00',

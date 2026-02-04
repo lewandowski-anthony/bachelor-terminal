@@ -2,7 +2,7 @@ const MAX_PASSWORD_ATTEMPTS = 3;
 
 window.USERS = {
     benjamin: {
-        role: "admin",
+        role: "user",
         commands: ['bzbomb']
     },
     lucas: {
@@ -11,6 +11,10 @@ window.USERS = {
     },
     torio: {
         role: "user"
+    },
+    antoine: {
+        role: "superuser",
+        password: 'antoine2026'
     },
     anthony: {
         role: "admin",
@@ -21,15 +25,19 @@ window.USERS = {
 window.ROLES = {
     admin: {
         level: 0,
-        commands: ['logs']
-    },
-    user: {
-        level: 1,
         commands: ['files']
     },
-    guest: {
+    superuser: {
+        level: 1,
+        commands: ['users']
+    },
+    user: {
         level: 2,
-        commands: ['help', 'about', 'logout', 'clear']
+        commands: ['logs']
+    },
+    guest: {
+        level: 3,
+        commands: ['help', 'about', 'logout', 'clear', 'logout']
     }
 };
 
@@ -37,6 +45,7 @@ window.ROLES = {
 window.auth = {
     state: 'login',
     username: '',
+    role: 'guest',
     commands: []
 };
 
@@ -69,6 +78,7 @@ window.handleAuthLoginInput = function (input) {
 
     auth.username = username;
     auth.commands = getCommandsForUser(username);
+    auth.role = USERS[username].role;
     auth.state = 'shell';
 
     if (USERS[username].hasOwnProperty('password')) {

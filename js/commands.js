@@ -1,3 +1,7 @@
+
+const M_SIZE_WIDTH = 25;
+const S_SIZE_WIDTH = 10;
+
 const COMMANDS = {
   help: {
     fn() {
@@ -52,6 +56,7 @@ const COMMANDS = {
     },
     desc: 'List all users of the terminal'
   },
+
   logout: {
     fn() {
       auth.state = 'login';
@@ -62,6 +67,57 @@ const COMMANDS = {
     },
     desc: 'Log out the user'
   },
+
+  logs: {
+    fn(args) {
+      if (!args || args.length === 0) {
+        term.writeln('Usage: logs [list|open] <log_id>');
+        return;
+      }
+      const sub = args[0].toLowerCase();
+      if (sub === 'list') {
+        
+        const sortedLogs = [...window.logList].sort((a, b) => new Date(b.date) - new Date(a.date));
+        term.writeln(
+          pad('id', S_SIZE_WIDTH) +
+          pad('creator', S_SIZE_WIDTH) +
+          pad('date', M_SIZE_WIDTH)
+        );
+        term.writeln('-'.repeat(M_SIZE_WIDTH + S_SIZE_WIDTH + S_SIZE_WIDTH));
+        sortedLogs
+        .forEach(log => {
+          term.writeln(
+            pad(log.id, S_SIZE_WIDTH) +
+            pad(log.creator, S_SIZE_WIDTH) +
+            pad(log.date, M_SIZE_WIDTH)
+          )
+        });
+      } else if (sub === 'open') {
+        const id = args[1];
+
+        if (!id) {
+          term.writeln('Usage: logs open <log_id>');
+          return;
+        }
+
+        const log = window.logList.find(f => f.id === id || String(f.id) === String(id));
+        if (!log) {
+          term.writeln(`Log not found: ${id}`);
+          return;
+        }
+        if(log.creator !== auth.username && auth.role !== 'admin') {
+          term.writeln(`You don't have permission to access this log.`);
+          return;
+        }
+        term.writeln(`Opening log ${log.id} created by ${log.creator} on ${log.date} ...`);
+        const text = atob(log.data);
+        term.writeln(`--- Log number ${log.id} from ${log.creator} on ${log.date} ---`);
+        text.split('\n').forEach(line => term.writeln(line));
+        term.writeln(`--- End of log number ${log.id} ---`);
+      }
+    }
+  },
+
   files: {
     fn(args) {
       if (!args || args.length === 0) {
@@ -73,30 +129,19 @@ const COMMANDS = {
       if (sub === 'list') {
         const sorted = [...window.fileList].sort((a, b) => a.type.localeCompare(b.type));
 
-        const nameWidth = 25;
-        const typeWidth = 10;
-        const statusWidth = 10;
-
         term.writeln(
-          pad('File Name', nameWidth) +
-          pad('Type', typeWidth) +
-          pad('Status', statusWidth)
+          pad('File Name', M_SIZE_WIDTH) +
+          pad('Type', S_SIZE_WIDTH) +
+          pad('Status', S_SIZE_WIDTH)
         );
-        term.writeln('-'.repeat(nameWidth + typeWidth + statusWidth));
-
+        term.writeln('-'.repeat(M_SIZE_WIDTH + S_SIZE_WIDTH + S_SIZE_WIDTH));
         sorted.forEach(f => {
           term.writeln(
-            pad(f.name, nameWidth) +
-            pad(f.type, typeWidth) +
-            pad(f.password ? 'protected' : 'public', statusWidth)
+            pad(f.name, M_SIZE_WIDTH) +
+            pad(f.type, S_SIZE_WIDTH) +
+            pad(f.password ? 'protected' : 'public', S_SIZE_WIDTH)
           );
         });
-
-        function pad(str, width) {
-          str = str || '';
-          if (str.length > width - 1) return str.slice(0, width - 1) + '…';
-          return str + ' '.repeat(width - str.length);
-        }
       } else if (sub === 'open') {
         const name = args[1];
         const pwd = args[2] || null;
@@ -124,12 +169,6 @@ const COMMANDS = {
         } else if (file.type === 'image') {
           const imgWindow = window.open('');
           imgWindow.document.write(`<img src="${atob(file.data)}" style="max-width:100%;height:auto;">`);
-        } 
-        else if (file.type === 'text') {
-          const text = atob(file.data);
-          term.writeln('--- ' + file.name + ' ---');
-          text.split('\n').forEach(line => term.writeln(line));
-          term.writeln('--- End of ' + file.name + ' ---');
         }
       } else {
         term.writeln('Unknown subcommand. Use list or open.');
@@ -142,7 +181,7 @@ const COMMANDS = {
 window.COMMANDS = COMMANDS;
 
 
-window.executeCommand = function(input) {
+window.executeCommand = function (input) {
   const parts = input.trim().split(/\s+/);
   const cmd = parts.shift().toLowerCase();
   const args = parts;
