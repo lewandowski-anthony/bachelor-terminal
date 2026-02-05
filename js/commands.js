@@ -10,13 +10,20 @@ class ICommand {
   async execute(args) {
     throw new Error('Execute method not implemented');
   }
+
+  get auth() {
+    return window.auth;
+  }
 }
 
 class CommandRegistry {
-  constructor(term, auth) {
+  constructor(term) {
     this.commands = {};
     this.term = term;
-    this.auth = auth;
+  }
+
+  get auth() {
+    return window.auth;
   }
 
   register(command) {
@@ -30,7 +37,7 @@ class CommandRegistry {
 
     if (!cmdName) return;
 
-    if (!this.auth.commands.includes(cmdName)) {
+    if (!this.auth.user.commands.includes(cmdName)) {
       this.term.writeln(`Unknown command: ${cmdName}`);
       return;
     }
@@ -73,9 +80,8 @@ class AbstractFileManagementCommand extends ICommand {
 
 
 class LogsCommand extends AbstractFileManagementCommand {
-  constructor(term, auth) {
+  constructor(term) {
     super('logs', 'List and open logs', term);
-    this.auth = auth;
   }
 
   usage() {
@@ -107,7 +113,7 @@ class LogsCommand extends AbstractFileManagementCommand {
     const log = window.logList.find(f => String(f.id) === String(id));
     if (!log) return this.term.writeln(`Log not found: ${id}`);
 
-    if (log.creator !== this.auth.username && this.auth.role !== 'admin') {
+    if (log.creator !== this.auth.user.username && this.auth.user.role !== 'admin') {
       return this.term.writeln(`You don't have permission to access this log.`);
     }
 
@@ -194,16 +200,15 @@ class BzBombCommand extends ICommand {
 }
 
 class HelpCommand extends ICommand {
-  constructor(term, auth, registry) {
+  constructor(term, registry) {
     super('help', 'List all the available commands');
     this.term = term;
-    this.auth = auth;
     this.registry = registry;
   }
 
   async execute() {
     this.term.writeln('Available commands:');
-    this.auth.commands.forEach(cmdName => {
+    this.auth.user.commands.forEach(cmdName => {
       const cmd = this.registry.commands[cmdName];
       const description = cmd?.description || '';
       this.term.writeln(`- ${cmdName} : ${description}`);
@@ -238,14 +243,14 @@ class UsersCommand extends ICommand {
   }
 }
 
-const commandRegistry = new CommandRegistry(term, auth);
+const commandRegistry = new CommandRegistry(term, window.auth);
 
 //-- Register usable commands 
-commandRegistry.register(new HelpCommand(term, auth, commandRegistry));
+commandRegistry.register(new HelpCommand(term, commandRegistry));
 commandRegistry.register(new ClearCommand(term, { value: promptText }));
 commandRegistry.register(new UsersCommand(term));
 commandRegistry.register(new BzBombCommand(term));
-commandRegistry.register(new LogsCommand(term, auth));
+commandRegistry.register(new LogsCommand(term));
 commandRegistry.register(new MediasCommand(term));
 
 window.COMMANDS = commandRegistry.commands;

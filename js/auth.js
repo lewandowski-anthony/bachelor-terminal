@@ -1,69 +1,59 @@
 const MAX_PASSWORD_ATTEMPTS = 3;
 
-window.USERS = {
-    benjamin: {
-        role: "user",
-        commands: ['bzbomb']
-    },
-    lucas: {
-        role: "user",
-        commands: ['slap']
-    },
-    torio: {
-        role: "user"
-    },
-    antoine: {
-        role: "superuser",
-        password: 'YW50b2luZTIwMjY='
-    },
-    anthony: {
-        role: "admin",
-        password: 'ZXZnMjAyNg=='
+class User {
+    constructor(username, role, userCommands, password) {
+        this.username = username;
+        this.role = role;
+        this.userCommands = userCommands || [];
+        this.password = password;
     }
+
+    get commands() {
+        const userRole = this.role;
+        const userCommands = this.userCommands || [];
+        const userLevel = ROLES[userRole]?.level ?? Infinity;
+
+        const inheritedRoles = Object.entries(ROLES)
+            .filter(([roleName, roleData]) => roleData.level >= userLevel)
+            .map(([roleName, roleData]) => roleData.commands || []);
+
+        const commands = inheritedRoles.flat().concat(userCommands);
+        return Array.from(new Set(commands));
+    }
+}
+
+class Role {
+    constructor(name, level, commands) {
+        this.name = name;
+        this.level = level;
+        this.commands = commands || [];
+    }
+}
+
+class Auth {
+    constructor(user) {
+        this.state = 'login';
+        this.user = user;
+    }
+}
+
+window.USERS = {
+    benjamin: new User("benjamin", "user", ['bzbomb']),
+    lucas: new User("lucas", "user", ['slap']),
+    torio: new User("torio", "user"),
+    antoine: new User("antoine", "superuser", [], 'YW50b2luZTIwMjY='),
+    anthony: new User("anthony", "admin", [], 'ZXZnMjAyNg==')
 };
 
 window.ROLES = {
-    admin: {
-        level: 0,
-        commands: ['medias']
-    },
-    superuser: {
-        level: 1,
-        commands: ['users']
-    },
-    user: {
-        level: 2,
-        commands: ['logs']
-    },
-    guest: {
-        level: 3,
-        commands: ['help', 'about', 'logout', 'clear', 'logout']
-    }
+    admin: new Role("admin", 0, ['medias']),
+    superuser: new Role("superuser", 1, ['users']),
+    user: new Role("user", 2, ['logs']),
+    guest: new Role("guest", 3, ['help', 'about', 'logout', 'clear', 'logout'])
 };
 
 
-window.auth = {
-    state: 'login',
-    username: '',
-    role: 'guest',
-    commands: []
-};
-
-function getCommandsForUser(username) {
-    const user = USERS[username];
-    if (!user) return [];
-
-    const userRole = user.role;
-    const userCommands = user.commands || [];
-    const userLevel = ROLES[userRole]?.level ?? Infinity;
-
-    const inheritedRoles = Object.entries(ROLES)
-        .filter(([roleName, roleData]) => roleData.level >= userLevel)
-        .map(([roleName, roleData]) => roleData.commands || []);
-
-    const commands = inheritedRoles.flat().concat(userCommands);
-    return Array.from(new Set(commands));
-}
+window.auth = new Auth();
 
 
 window.handleAuthLoginInput = function (input) {
@@ -76,13 +66,11 @@ window.handleAuthLoginInput = function (input) {
         return;
     }
 
-    auth.username = username;
-    auth.commands = getCommandsForUser(username);
-    auth.role = USERS[username].role;
-    auth.state = 'shell';
+    window.auth = new Auth(USERS[username]);
+    window.auth.state = 'shell';
 
-    if (USERS[username].hasOwnProperty('password')) {
-        auth.state = 'password';
+    if (window.auth.user.password) {
+        window.auth.state = 'password';
     }
 };
 
@@ -90,18 +78,16 @@ window.handleAuthPasswordInput = function (input, numberOfAttempts) {
 
     const inputPassword = input.trim();
 
-    if (btoa(inputPassword) !== USERS[auth.username].password) {
+    if (btoa(inputPassword) !== auth.user.password) {
         term.writeln('Incorrect password.');
         numberOfAttempts++;
         if (numberOfAttempts >= MAX_PASSWORD_ATTEMPTS) {
             term.writeln('Maximum password attempts exceeded. Returning to login.');
-            auth.state = 'login';
-            auth.username = '';
-            auth.commands = [];
+            auth = new Auth();
             numberOfAttempts=0
         }
         return numberOfAttempts;
     }
-    term.write('\r\n' + `Correct password. Welcome, ${auth.username}!\r\n`);
-    auth.state = 'shell';
+    term.write('\r\n' + `Correct password. Welcome, ${window.auth.user.username}!\r\n`);
+    window.auth.state = 'shell';
 };
