@@ -117,12 +117,15 @@ class LogsCommand extends AbstractFileManagementCommand {
       return this.term.writeln(`You don't have permission to access this log.`);
     }
 
+    this.term.writeln('');
     this.term.writeln(`Opening log ${log.id} created by ${log.creator} on ${log.date} ...`);
-    const text = atob(log.data);
+    const text = decodeBase64Utf8(log.data);
+    this.term.writeln('');
 
     this.term.writeln(`--- Log number ${log.id} from ${log.creator} on ${log.date} ---`);
     text.split('\n').forEach(line => this.term.writeln(line));
     this.term.writeln(`--- End of log number ${log.id} ---`);
+    this.term.writeln('');
   }
 }
 

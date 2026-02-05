@@ -56,6 +56,13 @@ function pad(str, width) {
   return str + ' '.repeat(width - str.length);
 }
 
+function decodeBase64Utf8(base64) {
+  const binary = atob(base64);
+  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+  const text = new TextDecoder('utf-8').decode(bytes);
+  return text;
+}
+
 function withLoading(term, message, action) {
   const totalSteps = 20;
   let currentStep = 0;
