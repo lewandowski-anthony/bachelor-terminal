@@ -199,8 +199,13 @@ class MediasCommand extends AbstractFileManagementCommand {
     const media = window.mediaList.find(f => f.name.toLowerCase() === name.toLowerCase());
     if (!media) return this.term.writeln(`Media not found: ${name}`);
 
-    if (media.password && atob(media.password).toLowerCase() !== String(pwd || '').toLowerCase()) {
-      return this.term.writeln('Wrong password!');
+    if(media.password) {
+      if (!isValidInput(pwd)) {
+        return this.term.writeln('Invalid password. Use only lowercase letters and numbers, no accents or apostrophes.');
+      }
+      if (atob(media.password).toLowerCase() !== String(pwd || '').toLowerCase()) {
+        return this.term.writeln('Wrong password!');
+      }
     }
 
     if(media.isLocked) {

@@ -54,7 +54,6 @@ window.USERS = {
     franck: new User("franck", "FranckTorio", ROLES['user'].name),
     antoine: new User("antoine", "TLD", ROLES['superuser'].name, [], 'YW50b2luZTIwMjY='),
     anthony: new User("anthony", "MrLew", ROLES['admin'].name, [], 'ZXZnMjAyNg=='),
-    test: new User("test", "userTest", ROLES['admin'].name, ['suitup', 'bzbomb']),
     logmaster: new User("logmaster", "Log Master", ROLES['admin'].name, ['logs'], 'bGVzNmdlbW1lc2RlbGluZmluaQ=='),
     // Special users with no password but easter eggs
     manon: new User("manon", "Manon", ROLES['special'].name, []),
@@ -119,11 +118,6 @@ handleSpecialUsernameInput = function(input) {
             break;
     }
 }
-
-function isValidInput(input) {
-  return /^[a-z0-9_-]+$/.test(input);
-}
-
 window.handleAuthLoginInput = function (input) {
 
     const username = input.trim() || 'guest';

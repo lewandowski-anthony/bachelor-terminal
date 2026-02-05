@@ -49,6 +49,9 @@ const clearLine = str => {
   return '\r' + str + ' '.repeat(80 - str.length);
 };
 
+function isValidInput(input) {
+  return /^[a-z0-9_-]+$/.test(input);
+}
 
 function pad(str, width) {
   str = String(str ?? '');
