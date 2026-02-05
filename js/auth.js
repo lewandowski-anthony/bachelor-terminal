@@ -39,20 +39,24 @@ class Auth {
 }
 
 window.ROLES = {
-    admin: new Role("admin", 0, ['medias']),
-    superuser: new Role("superuser", 1, ['users']),
-    user: new Role("user", 2, ['logs']),
-    guest: new Role("guest", 3, ['help', 'about', 'logout', 'clear', 'logout']),
-    special: new Role("special", 4)
+    admin: new Role("admin", 0, ['users']),
+    logmaster: new Role("logmaster", 1),
+    superuser: new Role("superuser", 2, ['users']),
+    user: new Role("user", 3, ['logs', 'medias']),
+    guest: new Role("guest", 4, ['help', 'about', 'logout', 'clear', 'hints']),
+    special: new Role("special", 5)
 };
 
 window.USERS = {
+    // Regular users
     benjamin: new User("benjamin", "BGBM", ROLES['user'].name, ['bzbomb']),
     lucas: new User("lucas", "CalusLaTortue", ROLES['user'].name, ['suitup']),
-    torio: new User("torio", "FranckyLaSourdure", ROLES['user'].name),
+    franck: new User("franck", "FranckyLaSourdure", ROLES['user'].name),
     antoine: new User("antoine", "TLD", ROLES['superuser'].name, [], 'YW50b2luZTIwMjY='),
     anthony: new User("anthony", "MrLew", ROLES['admin'].name, [], 'ZXZnMjAyNg=='),
     test: new User("test", "userTest", ROLES['admin'].name, ['suitup', 'bzbomb']),
+    logmaster: new User("logmaster", "Log Master", ROLES['admin'].name, ['logs'], 'bGVzNmdlbW1lc2RlbGluZmluaQ=='),
+    // Special users with no password but easter eggs
     manon: new User("manon", "Manon", ROLES['special'].name, []),
     laurent: new User("laurent", "Laurent", ROLES['special'].name, []),
     romane: new User("romane", "Romane", ROLES['special'].name, []),
@@ -116,16 +120,16 @@ handleSpecialUsernameInput = function(input) {
     }
 }
 
-function isValidUsername(username) {
-  return /^[a-z0-9_-]+$/.test(username);
+function isValidInput(input) {
+  return /^[a-z0-9_-]+$/.test(input);
 }
 
 window.handleAuthLoginInput = function (input) {
 
     const username = input.trim() || 'guest';
 
-    if (!isValidUsername(username)) {
-        term.writeln('Invalid username. Use only lowercase letters, no accents.');
+    if (!isValidInput(username)) {
+        term.writeln('Invalid username. Use only lowercase letters, no accents or apostrophes.');
         auth.state = 'login';
         return;
     }
@@ -155,6 +159,11 @@ window.handleAuthLoginInput = function (input) {
 window.handleAuthPasswordInput = function (input, numberOfAttempts) {
 
     const inputPassword = input.trim();
+
+    if (!isValidInput(inputPassword)) {
+        term.writeln('Invalid password. Use only lowercase letters and numbers, no accents or apostrophes.');
+        return numberOfAttempts;
+    }
 
     if (btoa(inputPassword) !== auth.user.password) {
         term.writeln('Incorrect password.');

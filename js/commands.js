@@ -46,6 +46,8 @@ class CommandRegistry {
     if (!command) return;
 
     await command.execute(args);
+
+    this.term.writeln('');
   }
 
   listCommands() {
@@ -78,10 +80,48 @@ class AbstractFileManagementCommand extends ICommand {
   open() { throw new Error('open() not implemented'); }
 }
 
+class HintsCommand extends AbstractFileManagementCommand {
+  constructor(term) { 
+    super('hints', 'return a hint about private informations. Usage : hints [list|open] <hint_id>', term);
+  }
+
+  usage() {
+    this.term.writeln('Usage: hints [list|open] <hint_id>');
+  }
+
+  list() {
+    const sortedHints = [...window.hintList].sort((a, b) => a.id - b.id );
+
+    this.term.writeln(
+      pad('id', S_SIZE_WIDTH) +
+      pad('title', M_SIZE_WIDTH)
+    );
+    this.term.writeln('-'.repeat(M_SIZE_WIDTH + S_SIZE_WIDTH));
+
+    sortedHints.forEach(hint => {
+      this.term.writeln(
+        pad(hint.id, S_SIZE_WIDTH) +
+        pad(hint.title, M_SIZE_WIDTH)
+      );
+    });
+  }
+
+  open(id) {
+    if (!id) return this.usage();
+    const hint = window.hintList.find(f => String(f.id) === String(id));
+    if (!hint) return this.term.writeln(`Hint not found: ${id}`);
+    this.term.writeln('');
+    this.term.writeln(`Opening hint ${hint.id} - ${hint.title} ...`);
+    this.term.writeln('');
+    this.term.writeln(hint.data);
+    this.term.writeln('');
+    this.term.writeln(`--- Hint number ${hint.id} - ${hint.title} ---`);
+  }
+}
 
 class LogsCommand extends AbstractFileManagementCommand {
   constructor(term) {
-    super('logs', 'List and open logs', term);
+    super('logs', 'List and open logs. Usage: logs [list|open] <log_id>', term);
   }
 
   usage() {
@@ -89,7 +129,7 @@ class LogsCommand extends AbstractFileManagementCommand {
   }
 
   list() {
-    const sortedLogs = [...window.logList].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedLogs = [...window.logList].sort((a, b) => new Date(a.date) - new Date(b.date) );
 
     this.term.writeln(
       pad('id', S_SIZE_WIDTH) +
@@ -113,8 +153,9 @@ class LogsCommand extends AbstractFileManagementCommand {
     const log = window.logList.find(f => String(f.id) === String(id));
     if (!log) return this.term.writeln(`Log not found: ${id}`);
 
-    if (log.creator !== this.auth.user.username && this.auth.user.role !== 'admin') {
-      return this.term.writeln(`You don't have permission to access this log.`);
+    if (log.creator !== this.auth.user.username && ['admin', 'logmaster'].includes(this.auth.user.role) === false) {
+      this.term.writeln(`You don't have permission to access this log.`);
+      return this.term.writeln(`Please, use an admin account or the 'logmaster' account to access it.`);
     }
 
     this.term.writeln('');
@@ -125,13 +166,12 @@ class LogsCommand extends AbstractFileManagementCommand {
     this.term.writeln(`--- Log number ${log.id} from ${log.creator} on ${log.date} ---`);
     text.split('\n').forEach(line => this.term.writeln(line));
     this.term.writeln(`--- End of log number ${log.id} ---`);
-    this.term.writeln('');
   }
 }
 
 class MediasCommand extends AbstractFileManagementCommand {
   constructor(term) {
-    super('medias', 'List and open available medias', term);
+    super('medias', 'List and open available medias. Usage : medias [list|open] <filename> [password]', term);
   }
 
   usage() {
@@ -161,6 +201,10 @@ class MediasCommand extends AbstractFileManagementCommand {
 
     if (media.password && atob(media.password).toLowerCase() !== String(pwd || '').toLowerCase()) {
       return this.term.writeln('Wrong password!');
+    }
+
+    if(media.isLocked) {
+      return this.term.writeln(`This media is locked and cannot be opened for the moment.`);
     }
 
     this.term.writeln(`Opening ${media.name} (${media.type}) ...`);
@@ -356,6 +400,8 @@ class AboutCommand extends ICommand {
     this.term.writeln('It is where the bestmen and the witnesses can find all the necessary information about the event, such as schedules, locations, and more.');
     this.term.writeln('The bachelor countdown events informations are also hidden in this terminal, but you will have to find it by yourself !');
     this.term.writeln('The project demonstrates the use of JavaScript, HTML, and CSS to create an interactive and engaging user experience.');
+    this.term.writeln('');
+    this.term.writeln('© 2026');
   }
 }
 
@@ -425,6 +471,7 @@ commandRegistry.register(new LogsCommand(term));
 commandRegistry.register(new MediasCommand(term));
 commandRegistry.register(new AboutCommand(term));
 commandRegistry.register(new LogoutCommand(term, { value: promptText }));
+commandRegistry.register(new HintsCommand(term));
 
 window.COMMANDS = commandRegistry.commands;
 window.executeCommand = input => commandRegistry.execute(input);
