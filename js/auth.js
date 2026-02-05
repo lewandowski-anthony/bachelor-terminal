@@ -57,6 +57,13 @@ window.USERS = {
     laurent: new User("laurent", "Laurent", ROLES['special'].name, []),
     romane: new User("romane", "Romane", ROLES['special'].name, []),
     cassandra: new User("cassandra", "Cassandra", ROLES['special'].name, []),
+    norman: new User("norman", "Norman", ROLES['special'].name, []),
+    laouni: new User("laouni", "Laouni", ROLES['special'].name, []),
+    fanny: new User("fanny", "Fanny", ROLES['special'].name, []),
+    sofyan: new User("sofyan", "Sofyan", ROLES['special'].name, []),
+    samy: new User("samy", "Samy", ROLES['special'].name, []),
+    remi: new User("remi", "Remi", ROLES['special'].name, []),
+    alois: new User("alois", "Alois", ROLES['special'].name, []),
     guillaume: new User("guillaume", "Guillaume", ROLES['special'].name, [])
 };
 
@@ -83,14 +90,45 @@ handleSpecialUsernameInput = function(input) {
         case 'cm9tYW5l':
             window.open(atob("aHR0cDovL3lvdXR1YmUuY29tL3dhdGNoP3Y9MEpla0o2anRBTEkmbGlzdD1QTDhlZ2l3WkUxTGs1VFBoTnVYSHByd01TQ2JNSFRiT2p6JmluZGV4PTEwNA=="), '_blank');
             break;
+        case 'bm9ybWFu':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1Qc2VscnpqNjBpYyZ0PTE0cw=="), '_blank');
+            break;
+        case 'bGFvdW5p':
+            window.open(atob("aHR0cHM6Ly95b3V0dS5iZS9hZXVvSWlXbl9aYz9zaT1NcFE0SGtYVWlGUHpvbUI0JnQ9MjE1"), '_blank');
+            break;
+        case 'ZmFubnk=':
+            window.open(atob("aHR0cHM6Ly9mci53aWtpcGVkaWEub3JnL3dpa2kvUGllcnJlX0dhcm5pZXJfKGNoYW50ZXVyKQ=="), '_blank');
+            break;
+        case 'c29meWFu':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1nRVpvOGstaHg4WQ=="), '_blank');
+            break;
+        case 'c2FteQ==':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vc2hvcnRzL0NWbG9hLXFUVFE0"), '_blank');
+            break;
+        case 'cmVtaQ==':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1WWG41M0VxSlJBWQ=="), '_blank');
+            break;
+        case 'YWxvaXM=':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vc2hvcnRzL2VsY2JoSDVqNGZR"), '_blank');
+            break;
         default:
             break;
     }
 }
 
+function isValidUsername(username) {
+  return /^[a-z0-9_-]+$/.test(username);
+}
+
 window.handleAuthLoginInput = function (input) {
 
     const username = input.trim() || 'guest';
+
+    if (!isValidUsername(username)) {
+        term.writeln('Invalid username. Use only lowercase letters, no accents.');
+        auth.state = 'login';
+        return;
+    }
 
     if (!USERS.hasOwnProperty(username)) {
         term.writeln(`Unknown user: ${username}`);
