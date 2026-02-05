@@ -406,7 +406,7 @@ class AboutCommand extends ICommand {
     this.term.writeln('The bachelor countdown events informations are also hidden in this terminal, but you will have to find it by yourself !');
     this.term.writeln('The project demonstrates the use of JavaScript, HTML, and CSS to create an interactive and engaging user experience.');
     this.term.writeln('');
-    this.term.writeln('© 2026');
+    this.term.writeln('© 2026 - les6gemmesdelinfinie - All rights reserved.');
   }
 }
 
