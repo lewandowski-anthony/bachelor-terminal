@@ -38,25 +38,55 @@ class Auth {
     }
 }
 
-window.USERS = {
-    benjamin: new User("benjamin", "BGBM", "user", ['bzbomb']),
-    lucas: new User("lucas", "CalusLaTortue", "user", ['suitup']),
-    torio: new User("torio", "FranckyLaSourdure", "user"),
-    antoine: new User("antoine", "TLD", "superuser", [], 'YW50b2luZTIwMjY='),
-    anthony: new User("anthony", "MrLew", "admin", [], 'ZXZnMjAyNg=='),
-    test: new User("test", "userTest", "admin", ['suitup', 'bzbomb'])
-};
-
 window.ROLES = {
     admin: new Role("admin", 0, ['medias']),
     superuser: new Role("superuser", 1, ['users']),
     user: new Role("user", 2, ['logs']),
-    guest: new Role("guest", 3, ['help', 'about', 'logout', 'clear', 'logout'])
+    guest: new Role("guest", 3, ['help', 'about', 'logout', 'clear', 'logout']),
+    special: new Role("special", 4)
 };
 
+window.USERS = {
+    benjamin: new User("benjamin", "BGBM", ROLES['user'].name, ['bzbomb']),
+    lucas: new User("lucas", "CalusLaTortue", ROLES['user'].name, ['suitup']),
+    torio: new User("torio", "FranckyLaSourdure", ROLES['user'].name),
+    antoine: new User("antoine", "TLD", ROLES['superuser'].name, [], 'YW50b2luZTIwMjY='),
+    anthony: new User("anthony", "MrLew", ROLES['admin'].name, [], 'ZXZnMjAyNg=='),
+    test: new User("test", "userTest", ROLES['admin'].name, ['suitup', 'bzbomb']),
+    manon: new User("manon", "Manon", ROLES['special'].name, []),
+    laurent: new User("laurent", "Laurent", ROLES['special'].name, []),
+    romane: new User("romane", "Romane", ROLES['special'].name, []),
+    cassandra: new User("cassandra", "Cassandra", ROLES['special'].name, []),
+    guillaume: new User("guillaume", "Guillaume", ROLES['special'].name, [])
+};
 
 window.auth = new Auth();
 
+/**
+ * Handle special user cases after successful login
+ * Most of the time, it will open a new window to a website with hints or jokes
+ */
+handleSpecialUsernameInput = function(input) {
+    switch(btoa(input)) {
+        case 'Z3VpbGxhdW1l':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vc2hvcnRzL01tMC1iaTliN0tr"), '_blank');
+            break;
+        case 'bWFub24=':
+            window.open(atob("aHR0cHM6Ly93d3cuY291cnNmbG9yZW50LmZyLz9nZ2Vfc291cmNlPWdvb2dsZSZnZ2VfbWVkaXVtPWNwYyZnZ2VfdGVybT1jb3VycyUyMGZsb3JlbnQmZ2dlX2NhbXBhaWduPVNlYXJjaC1NYXJxdWUtUGFyaXMmZ2FkX3NvdXJjZT0xJmdhZF9jYW1wYWlnbmlkPTcxOTc0ODQwJmdicmFpZD0wQUFBQUFELUlHLUIxcFI2cWdYODJscG1vV3Jkbm5FLV8zJmdjbGlkPUNqMEtDUWlBbkpITUJoREFBUklzQUJyN2I4N1ZXX2ZfdFlaZkR0d051SW8tbGxyMjU1WmNOSFNZQWVpd3NSTGNIOUQzcXlnb0FtQWJ2X2NhQXY1NEVBTHdfd2NC"), '_blank');
+            break;
+        case 'Y2Fzc2FuZHJh':
+            window.open(atob("aHR0cHM6Ly9mci53aWtpcGVkaWEub3JnL3dpa2kvU2NodHJvdW1wZmV0dGU="), '_blank');
+            break;
+        case 'bGF1cmVudA==':
+            window.open(atob("aHR0cHM6Ly95b3V0dS5iZS9GOFZ2dFVWdHRhdw=="), '_blank');
+            break;
+        case 'cm9tYW5l':
+            window.open(atob("aHR0cDovL3lvdXR1YmUuY29tL3dhdGNoP3Y9MEpla0o2anRBTEkmbGlzdD1QTDhlZ2l3WkUxTGs1VFBoTnVYSHByd01TQ2JNSFRiT2p6JmluZGV4PTEwNA=="), '_blank');
+            break;
+        default:
+            break;
+    }
+}
 
 window.handleAuthLoginInput = function (input) {
 
@@ -65,6 +95,12 @@ window.handleAuthLoginInput = function (input) {
     if (!USERS.hasOwnProperty(username)) {
         term.writeln(`Unknown user: ${username}`);
         term.write(promptText);
+        return;
+    }
+
+    if(USERS[username].role === ROLES['special'].name) {
+        handleSpecialUsernameInput(username);
+        auth.state = 'login';
         return;
     }
 
