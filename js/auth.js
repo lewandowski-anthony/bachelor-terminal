@@ -130,7 +130,6 @@ window.handleAuthLoginInput = function (input) {
 
     if (!USERS.hasOwnProperty(username)) {
         term.writeln(`Unknown user: ${username}`);
-        term.write(promptText);
         return;
     }
 
