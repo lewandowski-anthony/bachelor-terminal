@@ -1,4 +1,3 @@
-
 let numberOfAttempts = 0;
 
 const SERVER_NAME = 'evg-2026-server';
@@ -7,7 +6,6 @@ const PASSWORD_LINE = 'password:';
 window.term = new Terminal({
   cursorBlink: true,
   cursorStyle: 'block',
-  cursorBlink: true,
   fontFamily: '"Courier New", monospace',
   fontSize: 15,
   theme: {
@@ -25,6 +23,10 @@ fitAddon.fit();
 window.promptText = 'login: ';
 let input = '';
 
+// --- Command history
+const history = [];
+let historyIndex = -1;
+
 term.write(promptText);
 
 term.onKey(async e => {
@@ -35,16 +37,29 @@ term.onKey(async e => {
     term.write('\r\n');
 
     if (auth.state === 'shell') {
+
+      if (input.trim()) 
+        history.push(input);
+      
+      historyIndex = history.length;
+
       await window.executeCommand(input);
-    } 
+    }
     else if (auth.state === 'password') {
       numberOfAttempts = handleAuthPasswordInput(input, numberOfAttempts);
     }
     else {
       handleAuthLoginInput(input);
     }
-    window.promptText = auth.state === 'login' ? 'login: ' : auth.state === 'password' ? `${PASSWORD_LINE}` : `${auth.user.displayName}@${SERVER_NAME}:~$ `;
-    term.write(promptText);
+
+    window.promptText = auth.state === 'login'
+      ? 'login: '
+      : auth.state === 'password'
+        ? `${PASSWORD_LINE}`
+        : `${auth.user.displayName}@${SERVER_NAME}:~$ `;
+
+    term.writeln('');
+    term.write(window.promptText);
     input = '';
   }
 
@@ -55,7 +70,26 @@ term.onKey(async e => {
     }
   }
 
-  else if (!event.ctrlKey && !event.metaKey && event.key.length === 1) {
+  else if (event.key === 'ArrowUp') {
+    if (history.length === 0) return;
+
+    historyIndex = Math.max(0, historyIndex - 1);
+    // Clear current line
+    term.write('\x1b[2K\r' + window.promptText + history[historyIndex]);
+    input = history[historyIndex];
+  }
+
+  else if (event.key === 'ArrowDown') {
+    if (history.length === 0) return;
+
+    historyIndex = Math.min(history.length, historyIndex + 1);
+
+    const nextInput = historyIndex < history.length ? history[historyIndex] : '';
+    term.write('\x1b[2K\r' + window.promptText + nextInput);
+    input = nextInput;
+  }
+
+  else if (!event.ctrlKey && !event.metaKey && key.length === 1) {
     input += key;
     term.write(key);
   }
