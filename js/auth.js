@@ -67,6 +67,9 @@ window.USERS = {
     samy: new User("samy", "Samy", ROLES['special'].name, []),
     remi: new User("remi", "Remi", ROLES['special'].name, []),
     alois: new User("alois", "Alois", ROLES['special'].name, []),
+    johnny: new User("johnny", "Johnny", ROLES['special'].name, []),
+    satan: new User("satan", "Satan", ROLES['special'].name, []),
+    renaud: new User("renaud", "Renaud", ROLES['special'].name, []),
     guillaume: new User("guillaume", "Guillaume", ROLES['special'].name, [])
 };
 
@@ -113,6 +116,15 @@ handleSpecialUsernameInput = function(input) {
             break;
         case 'YWxvaXM=':
             window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vc2hvcnRzL2VsY2JoSDVqNGZR"), '_blank');
+            break;
+        case 'am9obm55':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1nYUdnd1Q5OG9QTSZ0PTIxcw=="), '_blank');
+            break;
+        case 'c2F0YW4=':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vc2hvcnRzL24tb1hvVWo1azUw"), '_blank');
+            break;
+        case 'cmVuYXVk':
+            window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vc2hvcnRzL255RGZja3NQSlYw"), '_blank');
             break;
         default:
             break;
