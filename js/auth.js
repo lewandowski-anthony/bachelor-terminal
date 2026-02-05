@@ -1,8 +1,9 @@
 const MAX_PASSWORD_ATTEMPTS = 3;
 
 class User {
-    constructor(username, role, userCommands, password) {
+    constructor(username, displayName, role, userCommands, password) {
         this.username = username;
+        this.displayName = displayName;
         this.role = role;
         this.userCommands = userCommands || [];
         this.password = password;
@@ -38,11 +39,12 @@ class Auth {
 }
 
 window.USERS = {
-    benjamin: new User("benjamin", "user", ['bzbomb']),
-    lucas: new User("lucas", "user", ['slap']),
-    torio: new User("torio", "user"),
-    antoine: new User("antoine", "superuser", [], 'YW50b2luZTIwMjY='),
-    anthony: new User("anthony", "admin", [], 'ZXZnMjAyNg==')
+    benjamin: new User("benjamin", "BGBM", "user", ['bzbomb']),
+    lucas: new User("lucas", "CalusLaTortue", "user", ['suitup']),
+    torio: new User("torio", "FranckyLaSourdure", "user"),
+    antoine: new User("antoine", "TLD", "superuser", [], 'YW50b2luZTIwMjY='),
+    anthony: new User("anthony", "MrLew", "admin", [], 'ZXZnMjAyNg=='),
+    test: new User("test", "userTest", "admin", ['suitup', 'bzbomb'])
 };
 
 window.ROLES = {
@@ -71,6 +73,8 @@ window.handleAuthLoginInput = function (input) {
 
     if (window.auth.user.password) {
         window.auth.state = 'password';
+    } else {
+        term.writeln(`Welcome, ${window.auth.user.displayName}!`);
     }
 };
 
@@ -88,6 +92,6 @@ window.handleAuthPasswordInput = function (input, numberOfAttempts) {
         }
         return numberOfAttempts;
     }
-    term.write('\r\n' + `Correct password. Welcome, ${window.auth.user.username}!\r\n`);
+    term.write('\r\n' + `Correct password. Welcome, ${window.auth.user.displayName}!\r\n`);
     window.auth.state = 'shell';
 };

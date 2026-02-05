@@ -43,7 +43,7 @@ term.onKey(async e => {
     else {
       handleAuthLoginInput(input);
     }
-    window.promptText = auth.state === 'login' ? 'login: ' : auth.state === 'password' ? `${PASSWORD_LINE}` : `${auth.username}@${SERVER_NAME}:~$ `;
+    window.promptText = auth.state === 'login' ? 'login: ' : auth.state === 'password' ? `${PASSWORD_LINE}` : `${auth.user.displayName}@${SERVER_NAME}:~$ `;
     term.write(promptText);
     input = '';
   }
