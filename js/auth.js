@@ -51,7 +51,7 @@ window.USERS = {
     // Regular users
     benjamin: new User("benjamin", "BGBM", ROLES['user'].name, ['bzbomb']),
     lucas: new User("lucas", "CalusLaTortue", ROLES['user'].name, ['suitup']),
-    franck: new User("franck", "FranckyLaSourdure", ROLES['user'].name),
+    franck: new User("franck", "FranckTorio", ROLES['user'].name),
     antoine: new User("antoine", "TLD", ROLES['superuser'].name, [], 'YW50b2luZTIwMjY='),
     anthony: new User("anthony", "MrLew", ROLES['admin'].name, [], 'ZXZnMjAyNg=='),
     test: new User("test", "userTest", ROLES['admin'].name, ['suitup', 'bzbomb']),
