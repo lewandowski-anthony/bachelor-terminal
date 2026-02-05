@@ -111,7 +111,6 @@ term.onKey(async e => {
     const options = getAutocompleteOptions(input);
 
     if (options.length === 1) {
-      // One option, autocomplete directly
       const parts = input.trim().split(/\s+/);
       parts[parts.length - 1] = options[0];
       input = parts.join(' ') + ' ';
@@ -119,7 +118,6 @@ term.onKey(async e => {
     } 
     else if (options.length > 1) {
       if (now - lastTabTime < DOUBLE_TAB_THRESHOLD) {
-        // Double tab -> show all options
         term.write('\r\n' + options.join('  ') + '\r\n' + window.promptText + input);
       }
     }

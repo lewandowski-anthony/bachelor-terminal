@@ -11,7 +11,7 @@ window.hintList = [
   },
   {
     id: 3,
-    title: 'Hint to find usernames for Anthony or Antoine',
+    title: 'Hint to find usernames for users',
     data: 'La logique pour les utilisateur est exactement la même que pour Franck Torio. Si vous avez son username, pas de problème pour trouver quasi tout ceux disponibles.',
   }
 ];
