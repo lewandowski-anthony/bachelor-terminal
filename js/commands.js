@@ -1,198 +1,252 @@
-
+// Constants
 const M_SIZE_WIDTH = 25;
 const S_SIZE_WIDTH = 10;
 
-const COMMANDS = {
-  help: {
-    fn() {
-      term.writeln('Available commands:');
-      auth.commands.forEach(cmd => {
-        const description = window.COMMANDS[cmd]?.desc || '';
-        term.writeln(`- ${cmd} : ${description}`);
-      });
-    },
-    desc: 'List all the available commands'
-  },
+class ICommand {
+  constructor(name, description) {
+    this.name = name;
+    this.description = description;
+  }
+  async execute(args) {
+    throw new Error('Execute method not implemented');
+  }
+}
 
-  about: {
-    fn() {
-      term.writeln('Web terminal with custom users 😎');
-    },
-    desc: 'Information about this terminal'
-  },
+class CommandRegistry {
+  constructor(term, auth) {
+    this.commands = {};
+    this.term = term;
+    this.auth = auth;
+  }
 
-  clear: {
-    fn() {
-      term.clear();
-      term.write(promptText);
-    },
-    desc: 'Clear the screen'
-  },
+  register(command) {
+    this.commands[command.name] = command;
+  }
 
-  bzbomb: {
-    fn() {
-      term.writeln('💣 BOUNZI BOMB ACTIVATED 💣');
-      const weddingDate = new Date(2026, 8, 15, 12, 0, 0);
-      weddingCountdown(term, promptText, weddingDate);
-    },
-    desc: 'Activate the BZBOMB countdown'
-  },
+  async execute(input) {
+    const parts = input.trim().split(/\s+/);
+    const cmdName = parts.shift()?.toLowerCase();
+    const args = parts;
 
-  slap: {
-    fn() {
-      term.writeln('Lucas\'s heritage has been slapped!');
-      const weddingDate = new Date(2026, 9, 19, 12, 0, 0);
-      weddingCountdown(term, promptText, weddingDate);
-    },
-    desc: 'Virtually slap Lucas\'s heritage'
-  },
+    if (!cmdName) return;
 
-  users: {
-    fn() {
-      term.writeln('List of available users:');
-      Object.keys(window.USERS).forEach(user => {
-        if (user !== 'common') term.writeln(`- ${user}`);
-      });
-    },
-    desc: 'List all users of the terminal'
-  },
-
-  logout: {
-    fn() {
-      auth.state = 'login';
-      auth.username = '';
-      auth.commands = [];
-      promptText = 'login: ';
-      term.writeln('\nLogged out.\n');
-    },
-    desc: 'Log out the user'
-  },
-
-  logs: {
-    fn(args) {
-      if (!args || args.length === 0) {
-        term.writeln('Usage: logs [list|open] <log_id>');
-        return;
-      }
-      const sub = args[0].toLowerCase();
-      if (sub === 'list') {
-
-        const sortedLogs = [...window.logList].sort((a, b) => new Date(b.date) - new Date(a.date));
-        term.writeln(
-          pad('id', S_SIZE_WIDTH) +
-          pad('creator', S_SIZE_WIDTH) +
-          pad('date', M_SIZE_WIDTH)
-        );
-        term.writeln('-'.repeat(M_SIZE_WIDTH + S_SIZE_WIDTH + S_SIZE_WIDTH));
-        sortedLogs
-          .forEach(log => {
-            term.writeln(
-              pad(log.id, S_SIZE_WIDTH) +
-              pad(log.creator, S_SIZE_WIDTH) +
-              pad(log.date, M_SIZE_WIDTH)
-            )
-          });
-      } else if (sub === 'open') {
-        const id = args[1];
-
-        if (!id) {
-          term.writeln('Usage: logs open <log_id>');
-          return;
-        }
-
-        const log = window.logList.find(f => f.id === id || String(f.id) === String(id));
-        if (!log) {
-          term.writeln(`Log not found: ${id}`);
-          return;
-        }
-        if (log.creator !== auth.username && auth.role !== 'admin') {
-          term.writeln(`You don't have permission to access this log.`);
-          return;
-        }
-        term.writeln(`Opening log ${log.id} created by ${log.creator} on ${log.date} ...`);
-        const text = atob(log.data);
-        term.writeln(`--- Log number ${log.id} from ${log.creator} on ${log.date} ---`);
-        text.split('\n').forEach(line => term.writeln(line));
-        term.writeln(`--- End of log number ${log.id} ---`);
-      }
+    if (!this.auth.commands.includes(cmdName)) {
+      this.term.writeln(`Unknown command: ${cmdName}`);
+      return;
     }
-  },
 
-  files: {
-    fn(args) {
-      if (!args || args.length === 0) {
-        term.writeln('Usage: file [list|open] <filename> [password]');
-        return;
-      }
+    const command = this.commands[cmdName];
+    if (!command) return;
 
-      const sub = args[0].toLowerCase();
-      if (sub === 'list') {
-        return new Promise(resolve => {
-          withLoading(term, 'Loading files...', () => {
-            const sorted = [...window.fileList].sort((a, b) => a.type.localeCompare(b.type));
-            term.writeln(pad('File Name', 25) + pad('Type', 10) + pad('Status', 10));
-            term.writeln('-'.repeat(45));
-            sorted.forEach(f => {
-              term.writeln(pad(f.name, 25) + pad(f.type, 10) + pad(f.password ? 'protected' : 'public', 10));
-            });
-            resolve();
-          });
-        });
-      } else if (sub === 'open') {
-        const name = args[1];
-        const pwd = args[2] || null;
-
-        if (!name) {
-          term.writeln('Usage: file open <filename> [password]');
-          return;
-        }
-
-        const file = window.fileList.find(f => f.name.toLowerCase() === name.toLowerCase());
-        if (!file) {
-          term.writeln(`File not found: ${name}`);
-          return;
-        }
-
-        if (file.password && atob(file.password).toLowerCase() !== String(pwd).toLowerCase()) {
-          term.writeln('Wrong password!');
-          return;
-        }
-
-        term.writeln(`Opening ${file.name} (${file.type}) ...`);
-
-        if (file.type === 'video') {
-          window.open(atob(file.data), '_blank');
-        } else if (file.type === 'image') {
-          const imgWindow = window.open('');
-          imgWindow.document.write(`<img src="${atob(file.data)}" style="max-width:100%;height:auto;">`);
-        }
-      } else {
-        term.writeln('Unknown subcommand. Use list or open.');
-      }
-    },
-    desc: 'List and open available files'
-  }
-};
-
-window.COMMANDS = COMMANDS;
-
-
-window.executeCommand = async function (input) {
-  const parts = input.trim().split(/\s+/);
-  const cmd = parts.shift()?.toLowerCase();
-  const args = parts;
-
-  if (!cmd) return;
-
-  if (!auth.commands.includes(cmd)) {
-    term.writeln(`Unknown command: ${cmd}`);
-    return;
+    await command.execute(args);
   }
 
-  const command = window.COMMANDS[cmd];
-  if (!command) return;
+  listCommands() {
+    return Object.values(this.commands);
+  }
+}
 
-  await command.fn(args);
-};
+function pad(str, size) {
+  return String(str).padEnd(size, ' ');
+}
+
+class AbstractFileManagementCommand extends ICommand {
+  constructor(name, description, term) {
+    super(name, description);
+    this.term = term;
+  }
+
+  async execute(args) {
+    if (!args || args.length === 0) return this.usage();
+
+    const sub = args[0].toLowerCase();
+    if (sub === 'list') return this.list();
+    if (sub === 'open') return this.open(...args.slice(1));
+
+    this.term.writeln(`Unknown subcommand. Use list or open.`);
+  }
+
+  usage() { throw new Error('usage() not implemented'); }
+  list() { throw new Error('list() not implemented'); }
+  open() { throw new Error('open() not implemented'); }
+}
 
 
+class LogsCommand extends AbstractFileManagementCommand {
+  constructor(term, auth) {
+    super('logs', 'List and open logs', term);
+    this.auth = auth;
+  }
+
+  usage() {
+    this.term.writeln('Usage: logs [list|open] <log_id>');
+  }
+
+  list() {
+    const sortedLogs = [...window.logList].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    this.term.writeln(
+      pad('id', S_SIZE_WIDTH) +
+      pad('creator', S_SIZE_WIDTH) +
+      pad('date', M_SIZE_WIDTH)
+    );
+    this.term.writeln('-'.repeat(M_SIZE_WIDTH + 2 * S_SIZE_WIDTH));
+
+    sortedLogs.forEach(log => {
+      this.term.writeln(
+        pad(log.id, S_SIZE_WIDTH) +
+        pad(log.creator, S_SIZE_WIDTH) +
+        pad(log.date, M_SIZE_WIDTH)
+      );
+    });
+  }
+
+  open(id) {
+    if (!id) return this.usage();
+
+    const log = window.logList.find(f => String(f.id) === String(id));
+    if (!log) return this.term.writeln(`Log not found: ${id}`);
+
+    if (log.creator !== this.auth.username && this.auth.role !== 'admin') {
+      return this.term.writeln(`You don't have permission to access this log.`);
+    }
+
+    this.term.writeln(`Opening log ${log.id} created by ${log.creator} on ${log.date} ...`);
+    const text = atob(log.data);
+
+    this.term.writeln(`--- Log number ${log.id} from ${log.creator} on ${log.date} ---`);
+    text.split('\n').forEach(line => this.term.writeln(line));
+    this.term.writeln(`--- End of log number ${log.id} ---`);
+  }
+}
+
+class MediasCommand extends AbstractFileManagementCommand {
+  constructor(term) {
+    super('medias', 'List and open available medias', term);
+  }
+
+  usage() {
+    this.term.writeln('Usage: medias [list|open] <filename> [password]');
+  }
+
+  list() {
+    const sorted = [...window.mediaList].sort((a, b) => a.type.localeCompare(b.type));
+
+    this.term.writeln(pad('Media Name', 25) + pad('Type', 10) + pad('Status', 10));
+    this.term.writeln('-'.repeat(45));
+
+    sorted.forEach(f => {
+      this.term.writeln(
+        pad(f.name, 25) +
+        pad(f.type, 10) +
+        pad(f.password ? 'protected' : 'public', 10)
+      );
+    });
+  }
+
+  open(name, pwd) {
+    if (!name) return this.usage();
+
+    const media = window.mediaList.find(f => f.name.toLowerCase() === name.toLowerCase());
+    if (!media) return this.term.writeln(`Media not found: ${name}`);
+
+    if (media.password && atob(media.password).toLowerCase() !== String(pwd || '').toLowerCase()) {
+      return this.term.writeln('Wrong password!');
+    }
+
+    this.term.writeln(`Opening ${media.name} (${media.type}) ...`);
+
+    if (media.type === 'video') {
+      window.open(atob(media.data), '_blank');
+    } else if (media.type === 'image') {
+      const imgWindow = window.open('');
+      imgWindow.document.write(`<img src="${atob(media.data)}" style="max-width:100%;height:auto;">`);
+    } else {
+      const text = atob(media.data);
+      this.term.writeln(`--- ${media.name} content ---`);
+      text.split('\n').forEach(line => this.term.writeln(line));
+      this.term.writeln(`--- End of ${media.name} ---`);
+    }
+  }
+}
+
+
+class BzBombCommand extends ICommand {
+  constructor(term) {
+    super('bzbomb', 'Activate the bounzi bomb');
+    this.term = term;
+  }
+
+  async execute() {
+    this.term.writeln("BOUNZI BOMB ACTIVATED !");
+    const bomb = [
+      '     _ ._  _ , _ ._',
+      '   (_\'( `  )_  .__)',
+      ' ( (  (    )   `)  )_)',
+      '(_\'__(_   (_ . _) _) ,__)',
+      '   ( ( (  ) _`( )_` )  )',
+      '  (__(_(._.)_)(_)_) ,__)',
+      '     `~~`\\\'`~~`',
+      '          -BOOM-'
+    ];
+    bomb.forEach(line => this.term.writeln(line));
+  }
+}
+
+class HelpCommand extends ICommand {
+  constructor(term, auth, registry) {
+    super('help', 'List all the available commands');
+    this.term = term;
+    this.auth = auth;
+    this.registry = registry;
+  }
+
+  async execute() {
+    this.term.writeln('Available commands:');
+    this.auth.commands.forEach(cmdName => {
+      const cmd = this.registry.commands[cmdName];
+      const description = cmd?.description || '';
+      this.term.writeln(`- ${cmdName} : ${description}`);
+    });
+  }
+}
+
+class ClearCommand extends ICommand {
+  constructor(term, promptTextRef) {
+    super('clear', 'Clear the screen');
+    this.term = term;
+    this.promptTextRef = promptTextRef;
+  }
+
+  async execute() {
+    this.term.clear();
+    this.term.write(this.promptTextRef.value);
+  }
+}
+
+class UsersCommand extends ICommand {
+  constructor(term) {
+    super('users', 'List all users of the terminal');
+    this.term = term;
+  }
+
+  async execute() {
+    this.term.writeln('List of available users:');
+    Object.keys(window.USERS).forEach(user => {
+      if (user !== 'common') this.term.writeln(`- ${user}`);
+    });
+  }
+}
+
+const commandRegistry = new CommandRegistry(term, auth);
+
+//-- Register usable commands 
+commandRegistry.register(new HelpCommand(term, auth, commandRegistry));
+commandRegistry.register(new ClearCommand(term, { value: promptText }));
+commandRegistry.register(new UsersCommand(term));
+commandRegistry.register(new BzBombCommand(term));
+commandRegistry.register(new LogsCommand(term, auth));
+commandRegistry.register(new MediasCommand(term));
+
+window.COMMANDS = commandRegistry.commands;
+window.executeCommand = input => commandRegistry.execute(input);

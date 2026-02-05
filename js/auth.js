@@ -25,7 +25,7 @@ window.USERS = {
 window.ROLES = {
     admin: {
         level: 0,
-        commands: ['files']
+        commands: ['medias']
     },
     superuser: {
         level: 1,

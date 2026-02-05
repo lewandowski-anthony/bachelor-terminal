@@ -1,4 +1,4 @@
-window.fileList = [
+window.mediaList = [
   {
     name: 'howToConnectAsAdmin.mp4',
     type: 'video',
