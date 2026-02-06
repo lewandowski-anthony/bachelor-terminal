@@ -11,18 +11,23 @@
 
 <body>
 
+    <script type="module">
+        import './js/commands/index.js';
+    </script>
+
+
     <div id="terminal"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
 
-    <script src="js/function.js"></script>
-    <script src="js/hints.js"></script>
-    <script src="js/medias.js"></script>
-    <script src="js/logs.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/terminal.js"></script>
-    <script src="js/commands.js"></script>
+    <script src="js/models/userState.js"></script>
+    <script src="js/helpers/commandHelper.js"></script>
+    <script src="js/data/hints.js"></script>
+    <script src="js/data/medias.js"></script>
+    <script src="js/data/logs.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/terminal.js"></script>
 </body>
 
 </html>

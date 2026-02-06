@@ -31,12 +31,6 @@ class Role {
     }
 }
 
-class Auth {
-    constructor(user) {
-        this.state = 'login';
-        this.user = user;
-    }
-}
 
 window.ROLES = {
     admin: new Role("admin", 0, ['users']),
@@ -73,7 +67,7 @@ window.USERS = {
     guillaume: new User("guillaume", "Guillaume", ROLES['special'].name, [])
 };
 
-window.auth = new Auth();
+window.auth = new UserState();
 
 /**
  * Handle special user cases after successful login
@@ -151,7 +145,7 @@ window.handleAuthLoginInput = function (input) {
         return;
     }
 
-    window.auth = new Auth(USERS[username]);
+    window.auth = new UserState(USERS[username]);
     window.auth.state = 'shell';
 
     if (window.auth.user.password) {
@@ -175,7 +169,7 @@ window.handleAuthPasswordInput = function (input, numberOfAttempts) {
         numberOfAttempts++;
         if (numberOfAttempts >= MAX_PASSWORD_ATTEMPTS) {
             term.writeln('Maximum password attempts exceeded. Returning to login.');
-            auth = new Auth();
+            auth = new UserState();
             numberOfAttempts=0
         }
         return numberOfAttempts;
