@@ -18,5 +18,10 @@ export const hintList = [
     id: 4,
     title: 'What to find on the server ?',
     data: 'Le principal type de données à dénicher dans le serveur sont les medias. Ces derniers seront protégés par des mots de passe, et il faudra trouver ces mots de passe pour les débloquer. Les logs peuvent aussi être intéressants à consulter, on y trouve parfois des informations sensibles.',
+  },
+  {
+    id: 5,
+    title: 'Open TLD 2.0 media',
+    data: 'Le mot de passe est une date lié au projet TLD, au format DD/MM/YYYY.',
   }
 ];

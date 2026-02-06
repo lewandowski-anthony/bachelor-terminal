@@ -28,7 +28,7 @@ export default class MediasCommand extends AbstractListOpenCommand {
         return this.term.writeln('This media is protected by a password. Please provide it as the last argument.');
       }
       if (!isValidInput(pwd)) {
-        return this.term.writeln('Invalid password. Use only lowercase letters and numbers, no accents or apostrophes.');
+        return this.term.writeln('Invalid password. Use only lowercase letters and numbers and symbols as _ / -, no accents or apostrophes.');
       }
       if (decodeBase64Utf8(media.password).toLowerCase() !== String(pwd || '').toLowerCase()) {
         return this.term.writeln('Wrong password!');

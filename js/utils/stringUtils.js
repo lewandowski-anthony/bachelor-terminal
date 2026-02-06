@@ -1,5 +1,5 @@
 export function isValidInput(input) {
-  return /^[a-z0-9_-]+$/.test(input);
+  return /^[a-z0-9_\/-]+$/.test(input);
 }
 
 export function toCamelCase(str) {

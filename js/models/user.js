@@ -33,6 +33,7 @@ export const USERS = {
     logmaster: new User("logmaster", "Log Master", ROLES['admin'].name, ['logs'], 'bGVzNmdlbW1lc2RlbGluZmluaQ=='),
     // Special users with no password but easter eggs
     manon: new User("manon", "Manon", ROLES['special'].name, []),
+    nesrine: new User("nesrine", "Nesrine", ROLES['special'].name, []),
     laurent: new User("laurent", "Laurent", ROLES['special'].name, []),
     romane: new User("romane", "Romane", ROLES['special'].name, []),
     cassandra: new User("cassandra", "Cassandra", ROLES['special'].name, []),

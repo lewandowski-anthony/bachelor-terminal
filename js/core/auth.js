@@ -59,6 +59,9 @@ export function handleSpecialUsernameInput(input) {
         case 'cmVuYXVk':
             window.open(atob("aHR0cHM6Ly93d3cueW91dHViZS5jb20vc2hvcnRzL255RGZja3NQSlYw"), '_blank');
             break;
+        case 'bmVzcmluZQ==':
+            window.open(atob("aHR0cHM6Ly95b3V0dS5iZS9GQUlXYTNyaU5wbz9zaT1GWnpQOWNNUVh3czdTMWxPJnQ9NDE="), '_blank');
+            break;
         default:
             break;
     }
