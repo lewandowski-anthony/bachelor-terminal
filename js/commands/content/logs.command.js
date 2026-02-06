@@ -1,6 +1,6 @@
 import AbstractListOpenCommand from '../core/AbstractListOpenCommand.js';
 import { renderTable } from '../utils/table.js';
-import { decodeBase64Utf8 } from '../utils/base64.js';
+import { decodeBase64Utf8 } from '../../utils/base64.js';
 import { USER_STATE } from '../../models/userState.js';
 import { logList } from '../../data/logs.js';
 

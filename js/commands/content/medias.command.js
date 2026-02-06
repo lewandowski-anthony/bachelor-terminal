@@ -1,6 +1,6 @@
 import AbstractListOpenCommand from '../core/AbstractListOpenCommand.js';
 import { renderTable } from '../utils/table.js';
-import { decodeBase64Utf8 } from '../utils/base64.js';
+import { decodeBase64Utf8 } from '../../utils/base64.js';
 import { isValidInput } from '../../utils/stringUtils.js';
 import { mediaList } from '../../data/medias.js';
 
