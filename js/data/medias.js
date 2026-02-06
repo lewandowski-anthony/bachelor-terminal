@@ -1,4 +1,4 @@
-window.mediaList = [
+export const mediaList = [
   {
     name: 'connexions.mp4',
     type: 'video',

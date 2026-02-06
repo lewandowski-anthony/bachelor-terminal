@@ -1,4 +1,4 @@
-window.hintList = [
+export const hintList = [
   {
     id: 1,
     title: 'Hint to find \'logmaster\' password',
