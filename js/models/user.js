@@ -47,5 +47,6 @@ export const USERS = {
     johnny: new User("johnny", "Johnny", ROLES['special'].name, []),
     satan: new User("satan", "Satan", ROLES['special'].name, []),
     renaud: new User("renaud", "Renaud", ROLES['special'].name, []),
+    erwan: new User("erwan", "Erwan", ROLES['special'].name, []),
     guillaume: new User("guillaume", "Guillaume", ROLES['special'].name, [])
 };
