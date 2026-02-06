@@ -1,8 +1,8 @@
 import AbstractListOpenCommand from '../core/AbstractListOpenCommand.js';
 import { renderTable } from '../utils/table.js';
-import { decodeBase64Utf8 } from '../../utils/base64.js';
+import { decodeBase64Utf8 } from '../utils/base64.js';
 
-class LogsCommand extends AbstractListOpenCommand {
+export default class LogsCommand extends AbstractListOpenCommand {
   constructor(term) {
     super('logs', 'List and open logs', term);
   }
@@ -11,10 +11,8 @@ class LogsCommand extends AbstractListOpenCommand {
     const logs = [...window.logList].sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
-
-    const headers = ['id', 'creator', 'date'];
-    const sizes = [10, 15, 25];
-    renderTable(this.term, headers, logs, sizes);
+    const headers = ['Id', 'Creator', 'Date'];
+    renderTable(this.term, headers, logs);
   }
 
   open(id) {
@@ -25,5 +23,3 @@ class LogsCommand extends AbstractListOpenCommand {
     text.split('\n').forEach(l => this.term.writeln(l));
   }
 }
-
-window.LogsCommand = LogsCommand;

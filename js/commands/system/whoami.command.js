@@ -1,4 +1,4 @@
-import ICommand from '../../core/ICommand.js';
+import ICommand from '../core/ICommand.js';
 
 export default class WhoAmICommand extends ICommand {
   constructor(term) {

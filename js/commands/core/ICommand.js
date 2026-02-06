@@ -1,4 +1,4 @@
-class ICommand {
+export default class ICommand {
   constructor(name, description) {
     this.name = name;
     this.description = description;
@@ -12,5 +12,3 @@ class ICommand {
     throw new Error('execute() not implemented');
   }
 }
-
-window.ICommand = ICommand;

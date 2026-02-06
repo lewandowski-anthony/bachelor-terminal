@@ -2,7 +2,7 @@ import AbstractListOpenCommand from '../core/AbstractListOpenCommand.js';
 import { renderTable } from '../utils/table.js';
 import { decodeBase64Utf8 } from '../utils/base64.js';
 
-class MediasCommand extends AbstractListOpenCommand {
+export default class MediasCommand extends AbstractListOpenCommand {
   constructor(term) {
     super('medias', 'List and open medias', term);
   }
@@ -11,10 +11,8 @@ class MediasCommand extends AbstractListOpenCommand {
     const medias = [...window.mediaList].sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
-
-    const headers = ['ID', 'Name', 'Type', 'Date'];
-    const sizes = [10, 15, 15, 25];
-    renderTable(this.term, headers, medias, sizes);
+    const headers = ['Name', 'Type'];
+    renderTable(this.term, headers, medias);
   }
 
   open(id) {
@@ -25,5 +23,3 @@ class MediasCommand extends AbstractListOpenCommand {
     text.split('\n').forEach(l => this.term.writeln(l));
   }
 }
-
-window.MediasCommand = MediasCommand;

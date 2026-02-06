@@ -1,6 +1,6 @@
 import ICommand from './ICommand.js';
 
-class AsciiCommand extends ICommand {
+export default class AsciiCommand extends ICommand {
   constructor(name, description, term) {
     super(name, description);
     this.term = term;
@@ -13,5 +13,3 @@ class AsciiCommand extends ICommand {
     }
   }
 }
-
-window.AsciiCommand = AsciiCommand;

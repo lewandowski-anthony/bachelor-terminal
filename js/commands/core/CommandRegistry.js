@@ -1,7 +1,33 @@
-class CommandRegistry {
+import HelpCommand from '../system/help.command.js';
+import LogsCommand from '../content/logs.command.js';
+import BzBombCommand from '../fun/bzbomb.command.js';
+import SuitUpCommand from '../fun/suitup.command.js';
+import HintsCommand from '../content/hints.command.js';
+import MediasCommand from '../content/medias.command.js';
+import WhoAmICommand from '../system/whoami.command.js';
+import AboutCommand from '../system/about.command.js';
+import VersionCommand from '../system/version.command.js';
+import LogoutCommand from '../system/logout.command.js';
+import ClearCommand from '../system/clear.command.js';
+
+
+export default class CommandRegistry {
   constructor(term) {
     this.term = term;
     this.commands = {};
+    [
+        new HelpCommand(term, this),
+        new LogsCommand(term),
+        new BzBombCommand(term),
+        new ClearCommand(term),
+        new SuitUpCommand(term),
+        new HintsCommand(term),
+        new MediasCommand(term),
+        new WhoAmICommand(term),
+        new AboutCommand(term),
+        new VersionCommand(term),
+        new LogoutCommand(term),
+    ].forEach(cmd => this.register(cmd));
   }
 
   register(command) {
@@ -30,5 +56,3 @@ class CommandRegistry {
     return window.auth;
   }
 }
-
-window.CommandRegistry = CommandRegistry;

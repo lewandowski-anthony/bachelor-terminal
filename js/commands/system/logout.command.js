@@ -8,6 +8,6 @@ export default class LogoutCommand extends ICommand {
 
   async execute() {
     window.auth.reset();
-    this.term.writeln('Logged out.');
+    term.writeln('Logged out.');
   }
 }

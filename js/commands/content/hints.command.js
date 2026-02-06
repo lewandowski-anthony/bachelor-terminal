@@ -10,10 +10,8 @@ export default class HintsCommand extends AbstractListOpenCommand {
     const hints = [...window.hintList].sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
-
-    const headers = ['ID', 'Title', 'Date'];
-    const sizes = [10, 15, 25];
-    renderTable(this.term, headers, hints, sizes);
+    const headers = ['Id', 'Title'];
+    renderTable(this.term, headers, hints);
   }
 
   open(id) {

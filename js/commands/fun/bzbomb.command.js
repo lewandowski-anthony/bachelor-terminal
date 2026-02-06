@@ -1,7 +1,7 @@
 import ICommand from '../core/ICommand.js';
 import { displayAsciiArt } from '../utils/ascii.js';
 
-class BzBombCommand extends ICommand {
+export default class BzBombCommand extends ICommand {
   constructor(term) {
     super('bzbomb', 'Activate the Bounzi Bomb');
     this.term = term;
@@ -42,12 +42,10 @@ class BzBombCommand extends ICommand {
       '      +BMMMMMMMMMMMBY:           ',
       '        :+YRBBBRVt;              '
     ];
-    await displayAsciiArt(EXPLOSION, {
+    await displayAsciiArt(EXPLOSION, this.term, {
       speed: 150,
       startingText: 'RUN FOR YOUR LIFE',
-      finalText: 'THE BOUNZI BOMB HAS EXPLODED'
+      finalText: 'THE BOUNZI BOMB HAS BEEN ACTIVATED',
     });
   }
 }
-
-window.BzBombCommand = BzBombCommand;

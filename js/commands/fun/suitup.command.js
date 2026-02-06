@@ -1,5 +1,5 @@
 import ICommand from '../core/ICommand.js';
-import { displayAscii } from '../utils/ascii.js';
+import { displayAsciiArt } from '../utils/ascii.js';
 
 export default class SuitUpCommand extends ICommand {
   constructor(term) {
@@ -9,7 +9,7 @@ export default class SuitUpCommand extends ICommand {
 
   async execute() {
     const LEGENDARY = [
-       '                     ........                                                                ',    
+       '                ........                                                                     ',    
        '             .::....:::::.                             ...                                   ',
        '           .^^^^:.......::                          :~!777!~^.                               ',
        '           ^^^^^::::....:                          ^???????777!~:.                           ',
@@ -47,7 +47,7 @@ export default class SuitUpCommand extends ICommand {
     '                                   ?&. .7#^.#?.:.JB.^@^7P7.   YB                                 ',
     '                                   ^5JJJJ: !Y     5!:5: :Y?   7Y                                 ',
     ]
-    await this.displayAsciiArt(legendary, {
+    await displayAsciiArt(LEGENDARY, this.term, {
       speed: 150,
       startingText: 'It is gonna be LEGEND- wait for it... !',
       finalText: 'LEGENDARY'

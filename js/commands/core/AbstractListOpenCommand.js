@@ -1,6 +1,6 @@
 import ICommand from './ICommand.js';
 
-class AbstractListOpenCommand extends ICommand {
+export default class AbstractListOpenCommand extends ICommand {
   constructor(name, description, term) {
     super(name, description);
     this.term = term;
@@ -20,5 +20,3 @@ class AbstractListOpenCommand extends ICommand {
   list() {}
   open() {}
 }
-
-window.AbstractListOpenCommand = AbstractListOpenCommand;
