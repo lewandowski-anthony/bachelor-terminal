@@ -76,7 +76,7 @@ export default class SlapCommand extends ICommand {
         try {
             await giveASlap(receiverName);
             this.term.writeln(`You gave a slap to ${receiverName}!`);
-            displayAsciiArt(SLAP_ASCII_ART, this.term, {
+            await displayAsciiArt(SLAP_ASCII_ART, this.term, {
                 speed: 150,
                 startingText: 'GIVING A SLAP TO ' + receiverName.toUpperCase(),
                 finalText: 'OH MY GOD THIS ONE SHOULD HURT ',
