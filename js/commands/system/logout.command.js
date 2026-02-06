@@ -1,4 +1,5 @@
 import ICommand from '../core/ICommand.js';
+import { USER_STATE } from '../../models/userState.js';
 
 export default class LogoutCommand extends ICommand {
   constructor(term) {
@@ -7,7 +8,7 @@ export default class LogoutCommand extends ICommand {
   }
 
   async execute() {
-    window.auth.reset();
-    term.writeln('Logged out.');
+    USER_STATE.reset();
+    this.term.writeln('Logged out.');
   }
 }

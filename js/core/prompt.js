@@ -1,5 +1,7 @@
+import { USER_STATE } from "../models/userState.js";
+
 export function getPrompt() {
-  if (state.auth.state === 'login') return 'login: ';
-  if (state.auth.state === 'password') return 'password: ';
-  return `${state.auth.user}@server:~$ `;
+  if (USER_STATE.state === 'login') return 'login: ';
+  if (USER_STATE.state === 'password') return 'password: ';
+  return `${USER_STATE.user.displayName}@server:~$ `;
 }

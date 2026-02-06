@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Terminal Web</title>
+    <title>Bachelor Terminal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css">
     <link rel="stylesheet" href="css/terminal.css">
 </head>
@@ -12,20 +12,21 @@
 
     <div id="terminal"></div>
 
-    <!-- Xterm et addons peuvent rester classiques -->
+    <!-- Xterm and addons -->
     <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
 
-    <!-- Scripts “classiques” -->
-    <script type="module" src="js/models/userState.js"></script>
-    <script src="js/helpers/commandHelper.js"></script>
+    <!-- Datasources -->
     <script src="js/data/hints.js"></script>
-    <script src="js/data/medias.js"></script>
+    <script type="module" src="js/data/medias.js"></script>
     <script src="js/data/logs.js"></script>
-    <script type="module" src="js/core/auth.js"></script>
-    <script src="js/core/terminal.js"></script>
 
-    <!-- Script principal des commandes en module -->
+    <!-- Classic scripts -->
+    <script type="module" src="js/models/userState.js"></script>
+    <script type="module" src="js/core/auth.js"></script>
+    <script type="module" src="js/core/terminal.js"></script>
+
+    <!-- Main commands script as module -->
     <script type="module" src="./js/commands/index.js"></script>
 
 </body>

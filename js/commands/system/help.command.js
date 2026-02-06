@@ -1,4 +1,5 @@
 import ICommand from '../core/ICommand.js';
+import {USER_STATE} from '../../models/userState.js';
 
 export default class HelpCommand extends ICommand {
   constructor(term, registry) {
@@ -9,7 +10,7 @@ export default class HelpCommand extends ICommand {
 
   async execute() {
     this.term.writeln('Available commands:');
-    this.auth.user.commands.forEach(name => {
+    USER_STATE.user.everyUserCommands.forEach(name => {
       const cmd = this.registry.commands[name];
       this.term.writeln(`- ${name} : ${cmd?.description || ''}`);
     });

@@ -1,8 +1,14 @@
-let numberOfAttempts = 0;
-const SERVER_NAME = 'evg-2026-server';
-const PASSWORD_LINE = 'password:';
+import { handleAuthLoginInput, handleAuthPasswordInput } from "./auth.js";
+import CommandRegistry from "../commands/core/CommandRegistry.js";
+import { USER_STATE } from "../models/userState.js";
+import { getPrompt } from "./prompt.js";
+import { mediaList } from "../data/medias.js";
+import { logList } from "../data/logs.js";
+import { hintList } from "../data/hints.js";
 
-window.term = new Terminal({
+let numberOfAttempts = 0;
+
+const term = new Terminal({
   cursorBlink: true,
   cursorStyle: 'block',
   fontFamily: '"Courier New", monospace',
@@ -14,12 +20,13 @@ window.term = new Terminal({
   }
 });
 
+const commandRegistry = new CommandRegistry(term);
+
 const fitAddon = new FitAddon.FitAddon();
 term.loadAddon(fitAddon);
 term.open(document.getElementById('terminal'));
 fitAddon.fit();
 
-window.promptText = 'login: ';
 let input = '';
 
 // --- Command history
@@ -36,13 +43,13 @@ function getAutocompleteOptions(currentInput) {
   const cmdName = parts[0]?.toLowerCase();
   const args = parts.slice(1);
 
-  const command = window.COMMANDS[cmdName];
+  const command = commandRegistry.commands[cmdName];
   if (!command || args.length === 0) return [];
 
   if (args[0] === 'open' || args.length === 1) {
     let options = [];
-    if (cmdName === 'logs') options = window.logList.map(l => String(l.id));
-    else if (cmdName === 'medias') options = window.mediaList.map(f => f.name);
+    if (cmdName === 'logs') options = logList.map(l => String(l.id));
+    else if (cmdName === 'medias') options = mediaList.map(f => f.name);
     else if (cmdName === 'files') options = window.fileList.map(f => f.name);
 
     const lastArg = args[args.length - 1];
@@ -52,35 +59,30 @@ function getAutocompleteOptions(currentInput) {
   return [];
 }
 
-term.write(window.promptText);
+term.write(getPrompt());
 
 term.onKey(async e => {
   const event = e.domEvent;
   const key = e.key;
 
   if (event.key === 'Enter') {
-    term.write('\r\n');
+    term.writeln('');
 
-    if (auth.state === 'shell') {
+    if (USER_STATE.state === 'shell') {
       if (input.trim()) history.push(input);
       historyIndex = history.length;
 
-      await window.executeCommand(input);
+      await commandRegistry.execute(input);
     } 
-    else if (auth.state === 'password') {
-      numberOfAttempts = handleAuthPasswordInput(input, numberOfAttempts);
+    else if (USER_STATE.state === 'password') {
+      let passwordInputResponse = handleAuthPasswordInput(input, numberOfAttempts);
+      numberOfAttempts = passwordInputResponse.numberOfAttempts;
+      term.writeln(passwordInputResponse.message + '\r\n');
     }
     else {
-      handleAuthLoginInput(input);
+      term.writeln(handleAuthLoginInput(input));
     }
-
-    window.promptText = auth.state === 'login'
-      ? 'login: '
-      : auth.state === 'password'
-      ? `${PASSWORD_LINE}`
-      : `${auth.user.displayName}@${SERVER_NAME}:~$ `;
-
-    term.write(window.promptText);
+    term.write(getPrompt());
     input = '';
   }
 
@@ -94,7 +96,7 @@ term.onKey(async e => {
   else if (event.key === 'ArrowUp') {
     if (history.length === 0) return;
     historyIndex = Math.max(0, historyIndex - 1);
-    term.write('\x1b[2K\r' + window.promptText + history[historyIndex]);
+    term.write('\x1b[2K\r' + getPrompt() + history[historyIndex]);
     input = history[historyIndex];
   }
 
@@ -102,7 +104,7 @@ term.onKey(async e => {
     if (history.length === 0) return;
     historyIndex = Math.min(history.length, historyIndex + 1);
     const nextInput = historyIndex < history.length ? history[historyIndex] : '';
-    term.write('\x1b[2K\r' + window.promptText + nextInput);
+    term.write('\x1b[2K\r' + getPrompt() + nextInput);
     input = nextInput;
   }
 
@@ -114,11 +116,11 @@ term.onKey(async e => {
       const parts = input.trim().split(/\s+/);
       parts[parts.length - 1] = options[0];
       input = parts.join(' ') + ' ';
-      term.write('\x1b[2K\r' + window.promptText + input);
+      term.write('\x1b[2K\r' + getPrompt() + input);
     } 
     else if (options.length > 1) {
       if (now - lastTabTime < DOUBLE_TAB_THRESHOLD) {
-        term.write('\r\n' + options.join('  ') + '\r\n' + window.promptText + input);
+        term.write('\r\n' + options.join('  ') + '\r\n' + getPrompt() + input);
       }
     }
 

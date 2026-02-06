@@ -9,7 +9,7 @@ export default class User {
         this.password = password;
     }
 
-    get commands() {
+    get everyUserCommands() {
         const userRole = this.role;
         const userCommands = this.userCommands || [];
         const userLevel = ROLES[userRole]?.level ?? Infinity;

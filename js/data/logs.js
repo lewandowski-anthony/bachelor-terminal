@@ -1,4 +1,4 @@
-window.logList = [
+export const logList = [
   {
     id: 1,
     date: '2026-02-02T12:00:00Z',

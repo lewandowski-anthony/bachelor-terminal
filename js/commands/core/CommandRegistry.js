@@ -9,6 +9,7 @@ import AboutCommand from '../system/about.command.js';
 import VersionCommand from '../system/version.command.js';
 import LogoutCommand from '../system/logout.command.js';
 import ClearCommand from '../system/clear.command.js';
+import {USER_STATE} from '../../models/userState.js';
 
 
 export default class CommandRegistry {
@@ -34,6 +35,10 @@ export default class CommandRegistry {
     this.commands[command.name] = command;
   }
 
+  get commandList() {
+    return Object.values(this.commands);
+  }
+
   async execute(input) {
     const parts = input.trim().split(/\s+/);
     const name = parts.shift()?.toLowerCase();
@@ -41,7 +46,7 @@ export default class CommandRegistry {
 
     if (!name) return;
 
-    if (!this.auth.user.commands.includes(name)) {
+    if (!USER_STATE.user.everyUserCommands.includes(name)) {
       this.term.writeln(`Unknown command: ${name}`);
       return;
     }

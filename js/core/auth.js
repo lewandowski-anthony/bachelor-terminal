@@ -64,56 +64,53 @@ export function handleSpecialUsernameInput(input) {
     }
 }
 
-window.handleAuthLoginInput = function (input) {
+export function handleAuthLoginInput(input) {
 
     const username = input.trim() || 'guest';
 
     if (!isValidInput(username)) {
-        term.writeln('Invalid username. Use only lowercase letters, no accents or apostrophes.');
-        auth.state = 'login';
-        return;
+        USER_STATE.reset();
+        return 'Invalid username. Use only lowercase letters, no accents or apostrophes.';
     }
 
     if (!USERS.hasOwnProperty(username)) {
-        term.writeln(`Unknown user: ${username}`);
-        return;
+        USER_STATE.reset();
+        return `Unknown user: ${username}`;
     }
 
     if(USERS[username].role === ROLES['special'].name) {
         handleSpecialUsernameInput(username);
-        auth.state = 'login';
-        return;
+        USER_STATE.reset();
+        return 'Welcome, you found one of the special users. Hope you enjoyed the easter egg.';
     }
 
-    window.auth = new UserState(USERS[username]);
-    window.auth.state = 'shell';
+    USER_STATE.login(USERS[username]);
 
-    if (window.auth.user.password) {
-        window.auth.state = 'password';
-    } else {
-        term.writeln(`Welcome, ${window.auth.user.displayName}!`);
+    if (USER_STATE.isPasswordRequired()) {
+        USER_STATE.state = 'password';
+        return 'Password required.';
     }
+
+    return `Welcome, ${USER_STATE.user.displayName}!`;
 };
 
-window.handleAuthPasswordInput = function (input, numberOfAttempts) {
+export function handleAuthPasswordInput(input, numberOfAttempts) {
 
     const inputPassword = input.trim();
 
     if (!isValidInput(inputPassword)) {
-        term.writeln('Invalid password. Use only lowercase letters and numbers, no accents or apostrophes.');
-        return numberOfAttempts;
+        return {numberOfAttempts: numberOfAttempts, message: 'Invalid password. Use only lowercase letters, no accents or apostrophes.'};
     }
 
-    if (btoa(inputPassword) !== auth.user.password) {
-        term.writeln('Incorrect password.');
+    if (btoa(inputPassword) != USER_STATE.user.password) {
         numberOfAttempts++;
         if (numberOfAttempts >= MAX_PASSWORD_ATTEMPTS) {
-            term.writeln('Maximum password attempts exceeded. Returning to login.');
-            auth = new UserState();
-            numberOfAttempts=0
+            USER_STATE.reset();
+            numberOfAttempts=0;
+            return {numberOfAttempts: numberOfAttempts, message: 'Maximum password attempts exceeded. Returning to login.'};
         }
-        return numberOfAttempts;
+        return {numberOfAttempts: numberOfAttempts, message: `Incorrect password. Attempt ${numberOfAttempts} of ${MAX_PASSWORD_ATTEMPTS}.`};
     }
-    term.write('\r\n' + `Correct password. Welcome, ${window.auth.user.displayName}!\r\n`);
-    window.auth.state = 'shell';
+    USER_STATE.state = 'shell';
+    return {numberOfAttempts: numberOfAttempts, message: `Welcome, ${USER_STATE.user.displayName}!`};
 };
