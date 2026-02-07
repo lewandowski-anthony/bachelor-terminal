@@ -1,5 +1,6 @@
 import Bird from './bird.js';
 import Pipe from './pipe.js';
+import { BIRD_WIDTH, BIRD_HEIGHT, GAP_SIZE, PIPE_SPEED, PIPE_SPAWN_INTERVAL, BIRD_START_X, BIRD_START_Y } from './constants.js';
 
 export default class Game {
     constructor(canvas) {
@@ -11,13 +12,17 @@ export default class Game {
         this.baseHeight = 640;
         this.scale = 1;
 
-        this.bird = new Bird(100, 200);
+        this.bird = new Bird(BIRD_START_X, BIRD_START_Y);
         this.pipes = [];
         this.pipeSpawnTimer = 0;
-        this.pipeSpawnInterval = 1750;
+        this.pipeSpawnInterval = PIPE_SPAWN_INTERVAL;
         this.score = 0;
 
+        this.isPause = false;
+        this.isGameOver = false;
+
         this.loop = this.loop.bind(this);
+        this.createPauseButton();
     }
 
     start() {
@@ -31,8 +36,30 @@ export default class Game {
     createControls() {
         document.addEventListener('keydown', e => {
             if (e.code === 'Space') this.bird.flap();
+            if (e.code === 'KeyP') this.togglePause();
         });
         this.canvas.addEventListener('click', () => this.bird.flap());
+    }
+
+    createPauseButton() {
+        const btn = document.createElement('button');
+        btn.innerText = 'Pause';
+        btn.style.position = 'absolute';
+        btn.style.top = '10px';
+        btn.style.zIndex = '100';
+        btn.style.padding = '8px 12px';
+        btn.style.fontSize = '16px';
+        document.body.appendChild(btn);
+        btn.addEventListener('click', () => {
+            btn.blur();
+            this.togglePause();
+        });
+        this.pauseBtn = btn;
+    }
+
+    togglePause() {
+        this.isPause = !this.isPause;
+        this.pauseBtn.innerText = this.isPause ? 'Resume' : 'Pause';
     }
 
     stop() {
@@ -52,17 +79,26 @@ export default class Game {
         }
 
         this.scale = this.canvas.width / this.baseWidth;
-        this.bird.width = 40 * this.scale;
-        this.bird.height = 40 * this.scale;
+        this.bird.width = BIRD_WIDTH * this.scale;
+        this.bird.height = BIRD_HEIGHT * this.scale;
         this.bird.xPosition = this.canvas.width * 0.2;
+
+        if (this.pauseBtn) {
+            const rect = this.canvas.getBoundingClientRect();
+            this.pauseBtn.style.top = rect.top + 10 + 'px';
+            this.pauseBtn.style.right = (window.innerWidth - rect.right + 10) + 'px';
+        }
     }
 
     loop(time) {
         if (!this.running) return;
-        const delta = time - (this.lastTime || time);
+        if (!this.lastTime) this.lastTime = time;
+        const delta = time - this.lastTime;
         this.lastTime = time;
-        this.update(delta);
+
+        if (!this.isPause) this.update(delta);
         this.render();
+
         requestAnimationFrame(this.loop);
     }
 
@@ -72,8 +108,8 @@ export default class Game {
         this.pipeSpawnTimer += delta;
         if (this.pipeSpawnTimer > this.pipeSpawnInterval) {
             this.pipeSpawnTimer = 0;
-            const gapSize = 120 * this.scale;
-            const speed = 2 * this.scale;
+            const gapSize = GAP_SIZE * this.scale;
+            const speed = PIPE_SPEED * this.scale;
             this.pipes.push(new Pipe(this.canvas, gapSize, speed));
         }
 
@@ -93,18 +129,29 @@ export default class Game {
     }
 
     gameOver() {
+        if (this.isGameOver) return;
+        this.isGameOver = true;
+
         this.stop();
+        this.isPause = false;
+
+        if (this.pauseBtn) this.pauseBtn.style.display = 'none';
+
         const replayBtn = document.getElementById('replayBtn');
         replayBtn.style.display = 'block';
+
         replayBtn.onclick = () => {
+            this.isGameOver = false;
             this.bird = new Bird(this.canvas.width * 0.2, this.canvas.height / 2);
             this.pipes = [];
             this.pipeSpawnTimer = 0;
             this.score = 0;
             replayBtn.style.display = 'none';
+            if (this.pauseBtn) this.pauseBtn.style.display = 'block';
             this.start();
         };
     }
+
 
     render() {
         const ctx = this.ctx;
@@ -115,8 +162,18 @@ export default class Game {
         this.bird.draw(ctx);
 
         ctx.fillStyle = 'white';
+        ctx.textAlign = 'left';
         ctx.font = `${20 * this.scale}px sans-serif`;
-        ctx.fillText('Flappy Ben 🐦', 10, 30 * this.scale);
-        ctx.fillText('Score: ' + this.score, 10, 60 * this.scale);
+        ctx.fillText('Flappy Ben 🐦', 10 * this.scale, 30 * this.scale);
+        ctx.fillText('Score: ' + this.score, 10 * this.scale, 60 * this.scale);
+
+        if (this.isPause) {
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.font = `${40 * this.scale}px sans-serif`;
+            ctx.fillText('PAUSE', this.canvas.width / 2, this.canvas.height / 2);
+        }
     }
 }
