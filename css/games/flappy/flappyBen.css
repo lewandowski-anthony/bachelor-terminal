@@ -1,0 +1,19 @@
+.game-button {
+    position: absolute;
+    z-index: 100;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    background: #27ae60;
+    border: 2px solid #1e8449;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.game-button:hover {
+    background: #2ecc71;
+    transform: scale(1.05);
+}

@@ -34,6 +34,11 @@ export default class Game {
 
         this.background = new Image();
         this.background.src = '../../assets/games/flappy/background.png';
+
+        this.pipePassedSound = new Audio('../../assets/games/flappy/beep.mp3');
+        this.bgMusic = new Audio('../../assets/games/flappy/background_music.mp3');
+        this.bgMusic.loop = true;
+        this.bgMusic.volume = 0.7;
     }
 
     start() {
@@ -45,32 +50,55 @@ export default class Game {
     }
 
     createControls() {
-        document.addEventListener('keydown', e => {
-            if (e.code === 'Space') this.bird.flap();
-            if (e.code === 'KeyP') this.togglePause();
-        });
-        this.canvas.addEventListener('click', () => this.bird.flap());
-    }
+    const startAudio = () => {
+        if (this.bgMusic && this.bgMusic.paused) {
+            this.bgMusic.play().catch(e => {});
+        }
+        document.removeEventListener('keydown', startAudio);
+        this.canvas.removeEventListener('click', startAudio);
+    };
+
+    document.addEventListener('keydown', startAudio);
+    this.canvas.addEventListener('click', startAudio);
+
+    document.addEventListener('keydown', e => {
+        if (e.code === 'Space') this.bird.flap();
+        if (e.code === 'KeyP') this.togglePause();
+    });
+
+    this.canvas.addEventListener('click', () => this.bird.flap());
+}
+
 
     createPauseButton() {
         const btn = document.createElement('button');
         btn.innerText = 'Pause';
-        btn.style.position = 'absolute';
-        btn.style.top = '10px';
-        btn.style.zIndex = '100';
-        btn.style.padding = '8px 12px';
-        btn.style.fontSize = '16px';
-        document.body.appendChild(btn);
-        btn.addEventListener('click', () => {
-            btn.blur();
-            this.togglePause();
+        btn.classList.add('game-button');
+        btn.addEventListener('mouseenter', () => {
+            btn.style.background = '#2ecc71';
+            btn.style.transform = 'scale(1.05)';
         });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.background = '#27ae60';
+            btn.style.transform = 'scale(1)';
+        });
+        btn.addEventListener('click', () => {
+            this.togglePause();
+            btn.blur();
+        });
+        document.body.appendChild(btn);
         this.pauseBtn = btn;
     }
+
 
     togglePause() {
         this.isPause = !this.isPause;
         this.pauseBtn.innerText = this.isPause ? 'Resume' : 'Pause';
+        if (this.paused) {
+            this.bgMusic.pause();
+        } else {
+            this.bgMusic.play();
+        }
     }
 
     stop() {
@@ -129,6 +157,7 @@ export default class Game {
             if (!pipe.passed && pipe.x + pipe.width < this.bird.xPosition) {
                 pipe.passed = true;
                 this.score += 1;
+                this.pipePassedSound.play();
             }
         });
 
@@ -150,6 +179,9 @@ export default class Game {
 
         const replayBtn = document.getElementById('replayBtn');
         replayBtn.style.display = 'block';
+        replayBtn.classList.add('game-button');
+        this.bgMusic.pause();
+        this.bgMusic.currentTime = 0;
 
         replayBtn.onclick = () => {
             this.isGameOver = false;
@@ -157,6 +189,7 @@ export default class Game {
             this.pipes = [];
             this.pipeSpawnTimer = 0;
             this.score = 0;
+            replayBtn.classList.remove('game-button');
             replayBtn.style.display = 'none';
             if (this.pauseBtn) this.pauseBtn.style.display = 'block';
             this.start();
@@ -195,7 +228,7 @@ export default class Game {
         ctx.fillStyle = 'white';
         ctx.textAlign = 'left';
         ctx.font = `${20 * this.scale}px sans-serif`;
-        ctx.fillText('Flappy Ben 🐦', 10 * this.scale, 30 * this.scale);
+        ctx.fillText('Flappy Ben', 10 * this.scale, 30 * this.scale);
         ctx.fillText('Score: ' + this.score, 10 * this.scale, 60 * this.scale);
 
         if (this.isPause || this.isGameOver) {
@@ -205,7 +238,7 @@ export default class Game {
             ctx.textAlign = 'center';
             ctx.font = `${40 * this.scale}px sans-serif`;
             ctx.fillText(this.isPause ? 'PAUSE' : 'GAME OVER', this.canvas.width / 2, this.canvas.height / 3);
-            if(this.isGameOver) {
+            if (this.isGameOver) {
                 ctx.font = `${25 * this.scale}px sans-serif`;
                 ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2, this.canvas.height / 3 + 50 * this.scale);
                 ctx.fillText('Click to Replay', this.canvas.width / 2, this.canvas.height / 3 + 75 * this.scale);
