@@ -30,11 +30,9 @@ export default class Pipe {
         const ctx = this.ctx;
         const radius = 10 * (this.canvas.width / 360);
 
-        // corps du tuyau
         ctx.fillStyle = '#2ecc71';
         ctx.fillRect(this.x, y + (top ? radius : 0), this.width, height - radius);
 
-        // capuchon
         ctx.beginPath();
         if (top) {
             ctx.arc(this.x + this.width / 2, y + radius, this.width / 2, Math.PI, 0, false);
@@ -44,7 +42,6 @@ export default class Pipe {
         ctx.fillStyle = '#27ae60';
         ctx.fill();
 
-        // contour léger pour effet 3D
         ctx.strokeStyle = '#1e8449';
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x, y + (top ? radius : 0), this.width, height - radius);
