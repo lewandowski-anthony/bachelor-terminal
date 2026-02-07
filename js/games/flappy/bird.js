@@ -2,9 +2,10 @@ export default class Bird {
     constructor(x, y) {
         this.xPosition = x;
         this.yPosition = y;
-        this.width = 70;
-        this.height = 70;
+        this.width = 60;
+        this.height = 60;
         this.velocity = 0;
+        this.flapVelocity = -8;
         this.gravity = 0.2;
         this.image = new Image();
         this.image.src = '../../assets/games/flappy/ben_face.png';
@@ -27,7 +28,7 @@ export default class Bird {
 
 
     flap() {
-        this.velocity = -6;
+        this.velocity = this.flapVelocity;
     }
 
     draw(ctx) {
