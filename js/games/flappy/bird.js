@@ -1,11 +1,13 @@
+import { BIRD_HEIGHT, BIRD_WIDTH, FLAP_VELOCITY } from "./constants.js";
+
 export default class Bird {
     constructor(x, y) {
         this.xPosition = x;
         this.yPosition = y;
-        this.width = 60;
-        this.height = 60;
+        this.width = BIRD_WIDTH;
+        this.height = BIRD_HEIGHT;
         this.velocity = 0;
-        this.flapVelocity = -6;
+        this.flapVelocity = FLAP_VELOCITY;
         this.gravity = 0.2;
         this.image = new Image();
         this.image.src = '../../assets/games/flappy/ben_face.png';
