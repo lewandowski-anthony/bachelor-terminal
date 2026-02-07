@@ -198,13 +198,18 @@ export default class Game {
         ctx.fillText('Flappy Ben 🐦', 10 * this.scale, 30 * this.scale);
         ctx.fillText('Score: ' + this.score, 10 * this.scale, 60 * this.scale);
 
-        if (this.isPause) {
+        if (this.isPause || this.isGameOver) {
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
             ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.font = `${40 * this.scale}px sans-serif`;
-            ctx.fillText('PAUSE', this.canvas.width / 2, this.canvas.height / 2);
+            ctx.fillText(this.isPause ? 'PAUSE' : 'GAME OVER', this.canvas.width / 2, this.canvas.height / 3);
+            if(this.isGameOver) {
+                ctx.font = `${25 * this.scale}px sans-serif`;
+                ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2, this.canvas.height / 3 + 50 * this.scale);
+                ctx.fillText('Click to Replay', this.canvas.width / 2, this.canvas.height / 3 + 75 * this.scale);
+            }
         }
     }
 }
