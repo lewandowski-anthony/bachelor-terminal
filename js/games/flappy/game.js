@@ -6,15 +6,18 @@ export default class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.running = false;
+
+        this.baseWidth = 360;
+        this.baseHeight = 640;
+        this.scale = 1;
+
         this.bird = new Bird(100, 200);
-        this.lastTime = 0;
         this.pipes = [];
         this.pipeSpawnTimer = 0;
-        this.pipeSpawnInterval = 1500;
+        this.pipeSpawnInterval = 1750;
         this.score = 0;
-        this.baseWidth = 600;
-        this.baseHeight = 600;
 
+        this.loop = this.loop.bind(this);
     }
 
     start() {
@@ -22,14 +25,12 @@ export default class Game {
         this.createControls();
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
-        requestAnimationFrame(this.loop.bind(this));
+        requestAnimationFrame(this.loop);
     }
 
     createControls() {
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                this.bird.flap();
-            }
+        document.addEventListener('keydown', e => {
+            if (e.code === 'Space') this.bird.flap();
         });
         this.canvas.addEventListener('click', () => this.bird.flap());
     }
@@ -39,50 +40,41 @@ export default class Game {
     }
 
     resizeCanvas() {
-        const oldWidth = this.canvas.width;
-        const oldHeight = this.canvas.height;
+        const windowRatio = window.innerWidth / window.innerHeight;
+        const gameRatio = this.baseWidth / this.baseHeight;
 
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        if (windowRatio > gameRatio) {
+            this.canvas.height = window.innerHeight;
+            this.canvas.width = window.innerHeight * gameRatio;
+        } else {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerWidth / gameRatio;
+        }
 
-        const scale = Math.min(this.canvas.width / this.baseWidth, this.canvas.height / this.baseHeight);
-
-        this.bird.width = 60 * scale;
-        this.bird.height = 60 * scale;
-        this.bird.gravity = 0.2 * scale;
-        this.bird.xPosition = this.bird.xPosition * (this.canvas.width / oldWidth);
-        this.bird.yPosition = this.bird.yPosition * (this.canvas.height / oldHeight);
-
-        this.pipes.forEach(pipe => {
-            pipe.gapSize = 150 * scale;
-            pipe.gapY = Math.random() * (this.canvas.height - pipe.gapSize - 40) + 20;
-            pipe.width = 50 * scale;
-            pipe.speed = 2 * scale;
-        });
-
-        this.bird.velocity = -8 * scale;
+        this.scale = this.canvas.width / this.baseWidth;
+        this.bird.width = 40 * this.scale;
+        this.bird.height = 40 * this.scale;
+        this.bird.xPosition = this.canvas.width * 0.2;
     }
-
 
     loop(time) {
         if (!this.running) return;
-
-        const delta = time - this.lastTime;
+        const delta = time - (this.lastTime || time);
         this.lastTime = time;
-
         this.update(delta);
         this.render();
-
-        requestAnimationFrame(this.loop.bind(this));
+        requestAnimationFrame(this.loop);
     }
 
     update(delta) {
-        this.bird.update(this.ctx);
+        this.bird.update(this.canvas);
 
         this.pipeSpawnTimer += delta;
         if (this.pipeSpawnTimer > this.pipeSpawnInterval) {
             this.pipeSpawnTimer = 0;
-            this.pipes.push(new Pipe(this.canvas, 150 * scale, 2 * scale));
+            const gapSize = 120 * this.scale;
+            const speed = 2 * this.scale;
+            this.pipes.push(new Pipe(this.canvas, gapSize, speed));
         }
 
         this.pipes.forEach(pipe => {
@@ -92,23 +84,20 @@ export default class Game {
                 this.score += 1;
             }
         });
+
         this.pipes = this.pipes.filter(pipe => !pipe.isOffScreen());
 
         for (let pipe of this.pipes) {
-            if (pipe.isCollidingWith(this.bird)) {
-                this.gameOver();
-            }
+            if (pipe.isCollidingWith(this.bird)) this.gameOver();
         }
     }
 
     gameOver() {
         this.stop();
-
         const replayBtn = document.getElementById('replayBtn');
         replayBtn.style.display = 'block';
-
         replayBtn.onclick = () => {
-            this.bird = new Bird(100, this.canvas.height / 2);
+            this.bird = new Bird(this.canvas.width * 0.2, this.canvas.height / 2);
             this.pipes = [];
             this.pipeSpawnTimer = 0;
             this.score = 0;
@@ -120,12 +109,14 @@ export default class Game {
     render() {
         const ctx = this.ctx;
         ctx.fillStyle = '#70bbce';
-        ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
         this.pipes.forEach(pipe => pipe.draw());
         this.bird.draw(ctx);
+
         ctx.fillStyle = 'white';
-        ctx.font = '24px sans-serif';
-        ctx.fillText('Flappy Ben 🐦', 20, 30);
-        ctx.fillText('Score: ' + this.score, 20, 60);
+        ctx.font = `${20 * this.scale}px sans-serif`;
+        ctx.fillText('Flappy Ben 🐦', 10, 30 * this.scale);
+        ctx.fillText('Score: ' + this.score, 10, 60 * this.scale);
     }
 }
