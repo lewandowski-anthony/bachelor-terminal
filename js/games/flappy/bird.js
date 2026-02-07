@@ -2,10 +2,12 @@ export default class Bird {
     constructor(x, y) {
         this.xPosition = x;
         this.yPosition = y;
-        this.width = 30;
-        this.height = 30;
+        this.width = 70;
+        this.height = 70;
         this.velocity = 0;
         this.gravity = 0.2;
+        this.image = new Image();
+        this.image.src = '../../assets/games/flappy/ben_face.png';
     }
 
     update(ctx) {
@@ -29,7 +31,6 @@ export default class Bird {
     }
 
     draw(ctx) {
-        ctx.fillStyle = 'yellow';
-        ctx.fillRect(this.xPosition, this.yPosition, this.width, this.height);
+        ctx.drawImage(this.image, this.xPosition, this.yPosition, this.width, this.height);
     }
 }
