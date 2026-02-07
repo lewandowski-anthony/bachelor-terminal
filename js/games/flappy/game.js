@@ -1,6 +1,14 @@
 import Bird from './bird.js';
 import Pipe from './pipe.js';
-import { BIRD_WIDTH, BIRD_HEIGHT, GAP_SIZE, PIPE_SPEED, PIPE_SPAWN_INTERVAL, BIRD_START_X, BIRD_START_Y } from './constants.js';
+import {
+    BIRD_WIDTH,
+    BIRD_HEIGHT,
+    GAP_SIZE,
+    PIPE_SPEED,
+    PIPE_SPAWN_INTERVAL,
+    BIRD_START_X,
+    BIRD_START_Y
+} from './constants.js';
 
 export default class Game {
     constructor(canvas) {
@@ -23,6 +31,9 @@ export default class Game {
 
         this.loop = this.loop.bind(this);
         this.createPauseButton();
+
+        this.background = new Image();
+        this.background.src = '../../assets/games/flappy/background.png';
     }
 
     start() {
@@ -155,8 +166,28 @@ export default class Game {
 
     render() {
         const ctx = this.ctx;
-        ctx.fillStyle = '#70bbce';
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        const imgRatio = this.background.width / this.background.height;
+        const canvasRatio = this.canvas.width / this.canvas.height;
+
+        let drawWidth, drawHeight;
+
+        if (canvasRatio > imgRatio) {
+            drawWidth = this.canvas.width;
+            drawHeight = drawWidth / imgRatio;
+        } else {
+            drawHeight = this.canvas.height;
+            drawWidth = drawHeight * imgRatio;
+        }
+
+        ctx.drawImage(
+            this.background,
+            0,
+            0,
+            drawWidth,
+            drawHeight
+        );
+
 
         this.pipes.forEach(pipe => pipe.draw());
         this.bird.draw(ctx);
