@@ -11,7 +11,7 @@ export default class GamesCommand extends AbstractListOpenCommand {
             id: 1,
             title: 'Flappy Ben',
             description: 'Help Ben (a.k.a Bounzi) fly through the pipes and beat the high score!',
-            link: './pages/flappy/flappy.html'
+            link: './bachelor-terminal/pages/flappy/flappy.html'
         },
     ];
 
