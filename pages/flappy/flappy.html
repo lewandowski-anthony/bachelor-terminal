@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Ben</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="../../css/games/flappy/flappyBen.css">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+
+    canvas {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="module">
+    import { startFlappy } from '/js/games/flappy/index.js';
+    startFlappy();
+  </script>
+  <button id="replayBtn" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
+    Replay
+  </button>
+</body>
+
+</html>
