@@ -25,8 +25,8 @@ export default class User {
 
 export const USERS = {
     // Regular users
-    benjamin: new User("benjamin", "BGBM", ROLES['user'].name, ['bzbomb', 'slap']),
-    lucas: new User("lucas", "CalusLaTortue", ROLES['user'].name, ['suitup', 'slap']),
+    benjamin: new User("benjamin", "BGBM", ROLES['user'].name, ['bzbomb', 'slap'], "d2hleQ=="),
+    lucas: new User("lucas", "CalusLaTortue", ROLES['user'].name, ['suitup', 'slap'], 'Z3VhY2Ftb2xl'),
     franck: new User("franck", "FranckTorio", ROLES['user'].name),
     antoine: new User("antoine", "TLD", ROLES['superuser'].name, [], 'YW50b2luZTIwMjY='),
     anthony: new User("anthony", "MrLew", ROLES['admin'].name, [], 'ZXZnMjAyNg=='),
