@@ -1,6 +1,5 @@
 import AbstractListOpenCommand from '../core/AbstractListOpenCommand.js';
 import { renderTable } from '../utils/table.js';
-import { hintList } from '../../data/hints.js';
 
 export default class GamesCommand extends AbstractListOpenCommand {
     constructor(term) {
@@ -12,7 +11,7 @@ export default class GamesCommand extends AbstractListOpenCommand {
             id: 1,
             title: 'Flappy Ben',
             description: 'Help Ben (a.k.a Bounzi) fly through the pipes and beat the high score!',
-            link: '/pages/flappy/flappy.html',
+            link: './pages/flappy/flappy.html'
         },
     ];
 
