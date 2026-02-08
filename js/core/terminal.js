@@ -40,6 +40,7 @@ const DOUBLE_TAB_THRESHOLD = 400; // ms
 // --- Maintenance settings
 const unlockDate = new Date('2026-02-28T00:00:00');
 let maintenanceInterval = null;
+let maintenanceBypassed = false;
 
 // --- Display maintenance message if needed
 function showMaintenanceMessage() {
@@ -81,16 +82,28 @@ function showMaintenanceMessage() {
 }
 
 // --- Check if maintenance is ongoing
-if (new Date() < unlockDate) {
-  // Block all keyboard input
-  term.onKey(e => e.domEvent.preventDefault());
+if (new Date() < unlockDate && !maintenanceBypassed) {
 
-  // Start the countdown
+  term.onKey(e => e.domEvent.preventDefault());
   maintenanceInterval = setInterval(showMaintenanceMessage, 1000);
   showMaintenanceMessage();
 } else {
   initTerminal();
 }
+
+window.addEventListener('keydown', (e) => {
+  // Ctrl + Shift + M
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
+    maintenanceBypassed = true;
+
+    clearInterval(maintenanceInterval);
+    term.clear();
+    initTerminal();
+
+    console.log('🚨 Maintenance bypass activé');
+  }
+});
+
 
 // --- Initialization function for the normal terminal
 function initTerminal() {
