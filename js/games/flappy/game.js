@@ -1,11 +1,14 @@
 import Bird from './bird.js';
 import Pipe from './pipe.js';
+import { USERS } from '../../models/user.js';
 import {
     BIRD_WIDTH,
     BIRD_HEIGHT,
     GAP_SIZE,
     PIPE_SPEED,
-    PIPE_SPAWN_INTERVAL
+    PIPE_SPEED_RATIO,
+    PIPE_SPAWN_INTERVAL,
+    GAP_SIZE_RATIO
 } from './constants.js';
 
 export default class Game {
@@ -16,7 +19,6 @@ export default class Game {
         this.baseWidth = 360;
         this.baseHeight = 640;
         this.scale = 1;
-        this.bird = new Bird(0, 0);
         this.pipes = [];
         this.pipeSpawnTimer = 0;
         this.pipeSpawnInterval = PIPE_SPAWN_INTERVAL;
@@ -31,6 +33,8 @@ export default class Game {
         this.bgMusic = new Audio('../../assets/games/flappy/background_music.mp3');
         this.bgMusic.loop = true;
         this.bgMusic.volume = 0.7;
+        this.bird = new Bird(0, 0, canvas);
+        this.highScore = 100;
     }
 
     start() {
@@ -115,8 +119,6 @@ export default class Game {
         }
 
         this.scale = this.canvas.width / this.baseWidth;
-        this.bird.width = BIRD_WIDTH * this.scale;
-        this.bird.height = BIRD_HEIGHT * this.scale;
 
         if (this.pauseBtn) {
             const rect = this.canvas.getBoundingClientRect();
@@ -143,8 +145,8 @@ export default class Game {
         this.pipeSpawnTimer += delta;
         if (this.pipeSpawnTimer > this.pipeSpawnInterval) {
             this.pipeSpawnTimer = 0;
-            const gapSize = GAP_SIZE * this.scale;
-            const speed = PIPE_SPEED * this.scale;
+            const gapSize = this.canvas.height * GAP_SIZE_RATIO;
+            const speed = this.canvas.width * PIPE_SPEED_RATIO;
             this.pipes.push(new Pipe(this.canvas, gapSize, speed));
         }
 
@@ -187,6 +189,7 @@ export default class Game {
         };
     }
 
+
     render() {
         const ctx = this.ctx;
 
@@ -211,6 +214,7 @@ export default class Game {
         ctx.font = `${20 * this.scale}px sans-serif`;
         ctx.fillText('Flappy Ben', 10 * this.scale, 30 * this.scale);
         ctx.fillText('Score: ' + this.score, 10 * this.scale, 60 * this.scale);
+        ctx.fillText('High score: ' + this.highScore, 10 * this.scale, 90 * this.scale);
 
         if (this.isPause || this.isGameOver) {
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -218,13 +222,58 @@ export default class Game {
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.font = `${40 * this.scale}px sans-serif`;
-            ctx.fillText(this.isPause ? 'PAUSE' : 'GAME OVER', this.canvas.width / 2, this.canvas.height / 3);
+            ctx.fillText(this.isPause ? 'PAUSE' : 'GAME OVER', this.canvas.width / 2, this.canvas.height / 4);
 
             if (this.isGameOver) {
-                ctx.font = `${25 * this.scale}px sans-serif`;
-                ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2, this.canvas.height / 3 + 50 * this.scale);
-                ctx.fillText('Click to Replay', this.canvas.width / 2, this.canvas.height / 3 + 75 * this.scale);
+                ctx.font = `${15 * this.scale}px sans-serif`;
+                ctx.textAlign = 'center';
+
+                ctx.fillText(
+                    `Score: ${this.score}`,
+                    this.canvas.width / 2,
+                    this.canvas.height / 4 + 50 * this.scale
+                );
+
+                ctx.fillText(
+                    'Click to Replay',
+                    this.canvas.width / 2,
+                    this.canvas.height / 4 + 75 * this.scale
+                );
+
+                if (this.score > this.highScore) {
+                    wrapText(
+                        ctx,
+                        `Congratulation on beating best score. Antoine's password : ${atob(USERS['antoine'].password)}`,
+                        this.canvas.width / 2,
+                        this.canvas.height / 4 + 100 * this.scale,
+                        this.canvas.width * 0.8,
+                        18 * this.scale
+                    );
+                }
             }
+
         }
     }
 }
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let currentY = y;
+
+    for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width > maxWidth && i > 0) {
+            ctx.fillText(line, x, currentY);
+            line = words[i] + ' ';
+            currentY += lineHeight;
+        } else {
+            line = testLine;
+        }
+    }
+
+    ctx.fillText(line, x, currentY);
+}
+
