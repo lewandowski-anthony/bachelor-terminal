@@ -11,6 +11,7 @@ import LogoutCommand from '../system/logout.command.js';
 import ClearCommand from '../system/clear.command.js';
 import {USER_STATE} from '../../models/userState.js';
 import SlapCommand from '../fun/slap.command.js';
+import GamesCommand from '../content/game.command.js';
 
 
 export default class CommandRegistry {
@@ -30,6 +31,7 @@ export default class CommandRegistry {
         new VersionCommand(term),
         new LogoutCommand(term),
         new SlapCommand(term),
+        new GamesCommand(term)
     ].forEach(cmd => this.register(cmd));
   }
 

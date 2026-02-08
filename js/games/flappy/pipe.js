@@ -1,3 +1,5 @@
+import { SINGLE_FRAME_DURATION } from "./constants.js";
+
 export default class Pipe {
     constructor(canvas, gapSize, speed, lastGapY = null) {
         this.canvas = canvas;
@@ -7,18 +9,17 @@ export default class Pipe {
         this.gapSize = gapSize;
         this.x = canvas.width;
         this.passed = false;
-
-        const minY = 40;
-        const maxY = canvas.height - gapSize - 40;
+        const minGapTop = canvas.height * 0.2;
+        const maxGapTop = canvas.height * 0.75 - gapSize;
         let gapY;
         do {
-            gapY = Math.random() * (maxY - minY) + minY;
+            gapY = Math.random() * (maxGapTop - minGapTop) + minGapTop;
         } while (lastGapY !== null && Math.abs(gapY - lastGapY) > canvas.height * 0.75);
         this.gapY = gapY;
     }
 
-    update() {
-        this.x -= this.speed;
+    update(delta) {
+        this.x -= this.speed * (delta / SINGLE_FRAME_DURATION); 
     }
 
     draw() {
