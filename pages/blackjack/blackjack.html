@@ -4,80 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Blackjack Graphique</title>
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            background: #2c3e50;
-            color: #ecf0f1;
-        }
-
-        #game {
-            margin-top: 30px;
-        }
-
-        .hand {
-            margin: 10px 0;
-        }
-
-        .cards {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .card {
-            background: white;
-            color: black;
-            padding: 10px 15px;
-            margin: 5px;
-            border-radius: 5px;
-            box-shadow: 2px 2px 5px #000;
-        }
-
-        button {
-            padding: 10px 20px;
-            margin: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        #result {
-            font-size: 24px;
-            margin-top: 20px;
-        }
-
-        .card-img {
-            width: 80px;
-            margin: 4px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-            border-radius: 6px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="../../css/games/blackjack/blackjack.css">
 </head>
 
 <body>
 
     <h1>Blackjack</h1>
-    <div id="game">
-        <div class="hand" id="playerHand">
-            <strong>Player Hand:</strong>
-            <div class="cards" id="playerCards"></div>
-            <div id="playerValue"></div>
+    <div id="gameContainer">
+        <div id="scoreboard">
+            <div>Player Victories: <span id="playerVictories">0</span></div>
+            <div>Dealer Victories: <span id="dealerVictories">0</span></div>
+            <div>First to 10 victories wins the game</div>
+            <div><span id="gameWinner"></span></div>
         </div>
-        <div class="hand" id="dealerHand">
-            <strong>Dealer Hand:</strong>
-            <div class="cards" id="dealerCards"></div>
+        <div id="dealerSection" class="hand-section">
+            <h2>Dealer</h2>
+            <div id="dealerCards" class="cards"></div>
             <div id="dealerValue"></div>
         </div>
-        <div>
+
+        <div id="playerSection" class="hand-section">
+            <h2>Player</h2>
+            <div id="playerCards" class="cards"></div>
+            <div id="playerValue"></div>
+        </div>
+
+        <div id="controls">
             <button id="hitBtn">Hit</button>
             <button id="standBtn">Stand</button>
             <button id="restartBtn">Restart</button>
         </div>
+
         <div id="result"></div>
     </div>
+
 
     <script type="module">
         import Game from '../../js/games/blackjack/game.js';

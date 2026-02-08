@@ -13,7 +13,7 @@ export const mediaList = [
     name: 'projet-secret.png',
     type: 'image',
     data: 'aHR0cHM6Ly9pLmltZ3VyLmNvbS9EWFExWFRXLnBuZw==',
-    password: 'bGFmZWV2ZXJ0ZQ==',
+    password: 'ZHVibGlu',
   },
   {
     name: 'mandarine.png',

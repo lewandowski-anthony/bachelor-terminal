@@ -13,6 +13,12 @@ export default class GamesCommand extends AbstractListOpenCommand {
             description: 'Help Ben (a.k.a Bounzi) fly through the pipes and beat the high score!',
             link: './pages/flappy/flappy.html'
         },
+        {
+            id: 2,
+            title: 'Blackjack',
+            description: 'Play a classic game of Blackjack against the dealer.',
+            link: './pages/blackjack/blackjack.html'
+        }
     ];
 
     list() {
