@@ -37,101 +37,159 @@ let historyIndex = -1;
 let lastTabTime = 0;
 const DOUBLE_TAB_THRESHOLD = 400; // ms
 
-// --- Helper: get autocomplete options
-function getAutocompleteOptions(currentInput) {
-  const parts = currentInput.trim().split(/\s+/);
-  const cmdName = parts[0]?.toLowerCase();
-  const args = parts.slice(1);
+// --- Maintenance settings
+const unlockDate = new Date('2026-02-28T00:00:00');
+let maintenanceInterval = null;
 
-  const command = commandRegistry.commands[cmdName];
-  if (!command || args.length === 0) return [];
+// --- Display maintenance message if needed
+function showMaintenanceMessage() {
+  term.clear();
 
-  if (args[0] === 'open' || args.length === 1) {
-    let options = [];
-    if (cmdName === 'logs') options = logList.map(l => String(l.id));
-    else if (cmdName === 'medias') options = mediaList.map(f => f.name);
-    else if (cmdName === 'files') options = window.fileList.map(f => f.name);
+  const now = new Date();
+  let diff = unlockDate - now;
 
-    const lastArg = args[args.length - 1];
-    return options.filter(o => o.startsWith(lastArg));
+  if (diff <= 0) {
+    clearInterval(maintenanceInterval);
+    term.clear();
+    initTerminal();
+    return;
   }
 
-  return [];
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  const message = `Maintenance in progress\nTime remaining: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+  const cols = term.cols;
+  const rows = term.rows;
+
+  const lines = message.split('\n');
+  const verticalPadding = Math.floor((rows - lines.length) / 2);
+
+  term.write('\x1b[2J'); // Clear the screen
+
+  // Vertical padding
+  for (let i = 0; i < verticalPadding; i++) term.writeln('');
+
+  // Center each line
+  lines.forEach(line => {
+    const padding = ' '.repeat(Math.floor((cols - line.length) / 2));
+    term.writeln(padding + line);
+  });
 }
 
-term.write(getPrompt());
+// --- Check if maintenance is ongoing
+if (new Date() < unlockDate) {
+  // Block all keyboard input
+  term.onKey(e => e.domEvent.preventDefault());
 
-term.onKey(async e => {
-  const event = e.domEvent;
-  const key = e.key;
+  // Start the countdown
+  maintenanceInterval = setInterval(showMaintenanceMessage, 1000);
+  showMaintenanceMessage();
+} else {
+  initTerminal();
+}
 
-  if (event.key === 'Enter') {
-    term.writeln('');
+// --- Initialization function for the normal terminal
+function initTerminal() {
+  term.write(getPrompt());
 
-    if (USER_STATE.state === 'shell') {
-      if (input.trim()) history.push(input);
-      historyIndex = history.length;
+  // --- Helper: get autocomplete options
+  function getAutocompleteOptions(currentInput) {
+    const parts = currentInput.trim().split(/\s+/);
+    const cmdName = parts[0]?.toLowerCase();
+    const args = parts.slice(1);
 
-      await commandRegistry.execute(input);
-    } 
-    else if (USER_STATE.state === 'password') {
-      let passwordInputResponse = handleAuthPasswordInput(input, numberOfAttempts);
-      numberOfAttempts = passwordInputResponse.numberOfAttempts;
-      term.writeln(passwordInputResponse.message + '\r\n');
+    const command = commandRegistry.commands[cmdName];
+    if (!command || args.length === 0) return [];
+
+    if (args[0] === 'open' || args.length === 1) {
+      let options = [];
+      if (cmdName === 'logs') options = logList.map(l => String(l.id));
+      else if (cmdName === 'medias') options = mediaList.map(f => f.name);
+      else if (cmdName === 'files') options = window.fileList?.map(f => f.name) || [];
+
+      const lastArg = args[args.length - 1];
+      return options.filter(o => o.startsWith(lastArg));
     }
-    else {
-      term.writeln(handleAuthLoginInput(input));
+
+    return [];
+  }
+
+  term.onKey(async e => {
+    const event = e.domEvent;
+    const key = e.key;
+
+    if (event.key === 'Enter') {
+      term.writeln('');
+
+      if (USER_STATE.state === 'shell') {
+        if (input.trim()) history.push(input);
+        historyIndex = history.length;
+
+        await commandRegistry.execute(input);
+      } 
+      else if (USER_STATE.state === 'password') {
+        const passwordInputResponse = handleAuthPasswordInput(input, numberOfAttempts);
+        numberOfAttempts = passwordInputResponse.numberOfAttempts;
+        term.writeln(passwordInputResponse.message + '\r\n');
+      }
+      else {
+        term.writeln(handleAuthLoginInput(input));
+      }
+      term.write(getPrompt());
+      input = '';
     }
-    term.write(getPrompt());
-    input = '';
-  }
 
-  else if (event.key === 'Backspace') {
-    if (input.length > 0) {
-      input = input.slice(0, -1);
-      term.write('\b \b');
-    }
-  }
-
-  else if (event.key === 'ArrowUp') {
-    if (history.length === 0) return;
-    historyIndex = Math.max(0, historyIndex - 1);
-    term.write('\x1b[2K\r' + getPrompt() + history[historyIndex]);
-    input = history[historyIndex];
-  }
-
-  else if (event.key === 'ArrowDown') {
-    if (history.length === 0) return;
-    historyIndex = Math.min(history.length, historyIndex + 1);
-    const nextInput = historyIndex < history.length ? history[historyIndex] : '';
-    term.write('\x1b[2K\r' + getPrompt() + nextInput);
-    input = nextInput;
-  }
-
-  else if (event.key === 'Tab') {
-    const now = Date.now();
-    const options = getAutocompleteOptions(input);
-
-    if (options.length === 1) {
-      const parts = input.trim().split(/\s+/);
-      parts[parts.length - 1] = options[0];
-      input = parts.join(' ') + ' ';
-      term.write('\x1b[2K\r' + getPrompt() + input);
-    } 
-    else if (options.length > 1) {
-      if (now - lastTabTime < DOUBLE_TAB_THRESHOLD) {
-        term.write('\r\n' + options.join('  ') + '\r\n' + getPrompt() + input);
+    else if (event.key === 'Backspace') {
+      if (input.length > 0) {
+        input = input.slice(0, -1);
+        term.write('\b \b');
       }
     }
 
-    lastTabTime = now;
-    event.preventDefault();
-  }
+    else if (event.key === 'ArrowUp') {
+      if (history.length === 0) return;
+      historyIndex = Math.max(0, historyIndex - 1);
+      term.write('\x1b[2K\r' + getPrompt() + history[historyIndex]);
+      input = history[historyIndex];
+    }
 
-  else if (!event.ctrlKey && !event.metaKey && key.length === 1) {
-    input += key;
-    term.write(key);
-  }
-});
+    else if (event.key === 'ArrowDown') {
+      if (history.length === 0) return;
+      historyIndex = Math.min(history.length, historyIndex + 1);
+      const nextInput = historyIndex < history.length ? history[historyIndex] : '';
+      term.write('\x1b[2K\r' + getPrompt() + nextInput);
+      input = nextInput;
+    }
 
-window.addEventListener('resize', () => fitAddon.fit());
+    else if (event.key === 'Tab') {
+      const now = Date.now();
+      const options = getAutocompleteOptions(input);
+
+      if (options.length === 1) {
+        const parts = input.trim().split(/\s+/);
+        parts[parts.length - 1] = options[0];
+        input = parts.join(' ') + ' ';
+        term.write('\x1b[2K\r' + getPrompt() + input);
+      } 
+      else if (options.length > 1) {
+        if (now - lastTabTime < DOUBLE_TAB_THRESHOLD) {
+          term.write('\r\n' + options.join('  ') + '\r\n' + getPrompt() + input);
+        }
+      }
+
+      lastTabTime = now;
+      event.preventDefault();
+    }
+
+    else if (!event.ctrlKey && !event.metaKey && key.length === 1) {
+      input += key;
+      term.write(key);
+    }
+  });
+
+  window.addEventListener('resize', () => fitAddon.fit());
+}
