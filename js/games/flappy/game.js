@@ -5,9 +5,7 @@ import {
     BIRD_HEIGHT,
     GAP_SIZE,
     PIPE_SPEED,
-    PIPE_SPAWN_INTERVAL,
-    BIRD_START_X,
-    BIRD_START_Y
+    PIPE_SPAWN_INTERVAL
 } from './constants.js';
 
 export default class Game {
@@ -15,26 +13,20 @@ export default class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.running = false;
-
         this.baseWidth = 360;
         this.baseHeight = 640;
         this.scale = 1;
-
-        this.bird = new Bird(BIRD_START_X, BIRD_START_Y);
+        this.bird = new Bird(0, 0);
         this.pipes = [];
         this.pipeSpawnTimer = 0;
         this.pipeSpawnInterval = PIPE_SPAWN_INTERVAL;
         this.score = 0;
-
         this.isPause = false;
         this.isGameOver = false;
-
         this.loop = this.loop.bind(this);
         this.createPauseButton();
-
         this.background = new Image();
         this.background.src = '../../assets/games/flappy/background.png';
-
         this.pipePassedSound = new Audio('../../assets/games/flappy/beep.mp3');
         this.bgMusic = new Audio('../../assets/games/flappy/background_music.mp3');
         this.bgMusic.loop = true;
@@ -44,31 +36,40 @@ export default class Game {
     start() {
         this.running = true;
         this.createControls();
-        this.resizeCanvas();
+        this.resetGame();
         window.addEventListener('resize', () => this.resizeCanvas());
         requestAnimationFrame(this.loop);
     }
 
+    resetGame() {
+        this.resizeCanvas();
+        this.bird.xPosition = this.canvas.width * 0.2;
+        this.bird.yPosition = this.canvas.height / 2;
+        this.bird.velocity = 0;
+        this.pipes = [];
+        this.pipeSpawnTimer = 0;
+        this.score = 0;
+        this.lastTime = null;
+        this.isPause = false;
+        this.isGameOver = false;
+    }
+
     createControls() {
-    const startAudio = () => {
-        if (this.bgMusic && this.bgMusic.paused) {
-            this.bgMusic.play().catch(e => {});
-        }
-        document.removeEventListener('keydown', startAudio);
-        this.canvas.removeEventListener('click', startAudio);
-    };
+        const startAudio = () => {
+            if (this.bgMusic.paused) this.bgMusic.play().catch(() => { });
+            document.removeEventListener('keydown', startAudio);
+            this.canvas.removeEventListener('click', startAudio);
+        };
+        document.addEventListener('keydown', startAudio);
+        this.canvas.addEventListener('click', startAudio);
 
-    document.addEventListener('keydown', startAudio);
-    this.canvas.addEventListener('click', startAudio);
+        document.addEventListener('keydown', e => {
+            if (e.code === 'Space') this.bird.flap();
+            if (e.code === 'KeyP') this.togglePause();
+        });
 
-    document.addEventListener('keydown', e => {
-        if (e.code === 'Space') this.bird.flap();
-        if (e.code === 'KeyP') this.togglePause();
-    });
-
-    this.canvas.addEventListener('click', () => this.bird.flap());
-}
-
+        this.canvas.addEventListener('click', () => this.bird.flap());
+    }
 
     createPauseButton() {
         const btn = document.createElement('button');
@@ -90,15 +91,11 @@ export default class Game {
         this.pauseBtn = btn;
     }
 
-
     togglePause() {
         this.isPause = !this.isPause;
         this.pauseBtn.innerText = this.isPause ? 'Resume' : 'Pause';
-        if (this.paused) {
-            this.bgMusic.pause();
-        } else {
-            this.bgMusic.play();
-        }
+        if (this.isPause) this.bgMusic.pause();
+        else this.bgMusic.play().catch(() => { });
     }
 
     stop() {
@@ -120,7 +117,6 @@ export default class Game {
         this.scale = this.canvas.width / this.baseWidth;
         this.bird.width = BIRD_WIDTH * this.scale;
         this.bird.height = BIRD_HEIGHT * this.scale;
-        this.bird.xPosition = this.canvas.width * 0.2;
 
         if (this.pauseBtn) {
             const rect = this.canvas.getBoundingClientRect();
@@ -135,14 +131,14 @@ export default class Game {
         const delta = time - this.lastTime;
         this.lastTime = time;
 
-        if (!this.isPause) this.update(delta);
+        if (!this.isPause && !this.isGameOver) this.update(delta);
         this.render();
 
         requestAnimationFrame(this.loop);
     }
 
     update(delta) {
-        this.bird.update(this.canvas);
+        this.bird.update(this.canvas, delta);
 
         this.pipeSpawnTimer += delta;
         if (this.pipeSpawnTimer > this.pipeSpawnInterval) {
@@ -153,11 +149,11 @@ export default class Game {
         }
 
         this.pipes.forEach(pipe => {
-            pipe.update();
+            pipe.update(delta);
             if (!pipe.passed && pipe.x + pipe.width < this.bird.xPosition) {
                 pipe.passed = true;
                 this.score += 1;
-                this.pipePassedSound.play();
+                this.pipePassedSound.play().catch(() => { });
             }
         });
 
@@ -168,10 +164,10 @@ export default class Game {
         }
     }
 
+
     gameOver() {
         if (this.isGameOver) return;
         this.isGameOver = true;
-
         this.stop();
         this.isPause = false;
 
@@ -184,18 +180,12 @@ export default class Game {
         this.bgMusic.currentTime = 0;
 
         replayBtn.onclick = () => {
-            this.isGameOver = false;
-            this.bird = new Bird(this.canvas.width * 0.2, this.canvas.height / 2);
-            this.pipes = [];
-            this.pipeSpawnTimer = 0;
-            this.score = 0;
-            replayBtn.classList.remove('game-button');
+            this.resetGame();
             replayBtn.style.display = 'none';
             if (this.pauseBtn) this.pauseBtn.style.display = 'block';
             this.start();
         };
     }
-
 
     render() {
         const ctx = this.ctx;
@@ -204,7 +194,6 @@ export default class Game {
         const canvasRatio = this.canvas.width / this.canvas.height;
 
         let drawWidth, drawHeight;
-
         if (canvasRatio > imgRatio) {
             drawWidth = this.canvas.width;
             drawHeight = drawWidth / imgRatio;
@@ -213,15 +202,7 @@ export default class Game {
             drawWidth = drawHeight * imgRatio;
         }
 
-        ctx.drawImage(
-            this.background,
-            0,
-            0,
-            drawWidth,
-            drawHeight
-        );
-
-
+        ctx.drawImage(this.background, 0, 0, drawWidth, drawHeight);
         this.pipes.forEach(pipe => pipe.draw());
         this.bird.draw(ctx);
 
@@ -238,6 +219,7 @@ export default class Game {
             ctx.textAlign = 'center';
             ctx.font = `${40 * this.scale}px sans-serif`;
             ctx.fillText(this.isPause ? 'PAUSE' : 'GAME OVER', this.canvas.width / 2, this.canvas.height / 3);
+
             if (this.isGameOver) {
                 ctx.font = `${25 * this.scale}px sans-serif`;
                 ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2, this.canvas.height / 3 + 50 * this.scale);

@@ -1,3 +1,5 @@
+import { SINGLE_FRAME_DURATION } from "./constants.js";
+
 export default class Pipe {
     constructor(canvas, gapSize, speed, lastGapY = null) {
         this.canvas = canvas;
@@ -16,8 +18,8 @@ export default class Pipe {
         this.gapY = gapY;
     }
 
-    update() {
-        this.x -= this.speed;
+    update(delta) {
+        this.x -= this.speed * (delta / SINGLE_FRAME_DURATION); 
     }
 
     draw() {

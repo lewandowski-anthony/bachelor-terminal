@@ -1,4 +1,5 @@
-import { BIRD_HEIGHT, BIRD_WIDTH, FLAP_VELOCITY } from "./constants.js";
+import { BIRD_WIDTH, BIRD_HEIGHT, FLAP_VELOCITY, BASE_GRAVITY,
+    SINGLE_FRAME_DURATION } from "./constants.js";
 
 export default class Bird {
     constructor(x, y) {
@@ -8,14 +9,17 @@ export default class Bird {
         this.height = BIRD_HEIGHT;
         this.velocity = 0;
         this.flapVelocity = FLAP_VELOCITY;
-        this.gravity = 0.2;
+        this.gravity = BASE_GRAVITY;
         this.image = new Image();
         this.image.src = '../../assets/games/flappy/ben_face.png';
     }
 
-    update(canvas) {
-        this.velocity += this.gravity;
-        this.yPosition += this.velocity;
+    update(canvas, deltaTime = SINGLE_FRAME_DURATION) {
+        this.velocity += this.gravity * deltaTime / SINGLE_FRAME_DURATION;
+        this.yPosition += this.velocity * deltaTime / SINGLE_FRAME_DURATION;
+
+        if (!canvas) return;
+
         if (this.yPosition + this.height > canvas.height) {
             this.yPosition = canvas.height - this.height;
             this.velocity = 0;
@@ -26,8 +30,9 @@ export default class Bird {
         }
     }
 
-    flap() {
-        this.velocity = this.flapVelocity;
+    flap(deltaTime = SINGLE_FRAME_DURATION) {
+        const dt = deltaTime / SINGLE_FRAME_DURATION;
+        this.velocity = this.flapVelocity * dt;
     }
 
     draw(ctx) {
