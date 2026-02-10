@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Jeu du Menteur</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                background: #2c3e50;
+                color: #ecf0f1;
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #gameTable {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                position: relative;
+                padding: 10px;
+            }
+
+            #middleRow {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                flex: 1;
+            }
+
+            .hand-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hand, .central-pile {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .horizontal {
+                flex-direction: row;
+            }
+
+            .vertical .player-name {
+                font-weight: bold;
+                margin-bottom: 10px;
+                font-size: 16px;
+            }
+
+            .horizontal .player-name {
+                font-weight: bold;
+                margin-bottom: 10px;
+                font-size: 16px;
+            }
+
+            .horizontal .card-img {
+                margin-left: -40px;
+                z-index: 1;
+                transition: transform 0.2s;
+            }
+
+            #playerCards .card-img:hover,
+            #playerCards .card-img:active {
+                transform: translateY(-10px);
+            }
+
+            .vertical {
+                flex-direction: column;
+            }
+
+            .vertical .card-img {
+                transform: rotate(-90deg);
+                transform-origin: top left;
+                margin-top: -70px;
+                z-index: 1;
+            }
+
+            .central-pile {
+                width: 150px;
+                height: 150px;
+                background: #34495e;
+                border-radius: 10px;
+                position: relative;
+                overflow: visible;
+            }
+
+            .central-pile .card-img {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                margin: 0 !important;
+                z-index: 1;
+                width: 60px;
+                height: 90px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0,0,0,1);
+            }
+
+            /* Style général des cartes */
+            .card-img {
+                width: 60px;
+                height: 90px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            }
+
+            /* Boutons */
+            button {
+                margin: 5px;
+                padding: 10px 15px;
+                border: none;
+                border-radius: 5px;
+                background: #3498db;
+                color: white;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            button:hover {
+                background: #2980b9;
+            }
+
+            #result {
+                margin-top: 20px;
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+        </style>
+    </head>
+    <body>
+        <h1>Jeu du Menteur</h1>
+
+        <div id="gameTable">
+            <div class="hand-container">
+                <div class="player-name">Bot 2</div>
+                <div class="hand horizontal" id="secondBotCardsDiv"></div>
+            </div>
+
+            <div id="middleRow">
+                <div class="hand-container">
+                    <div class="player-name">Bot 1</div>
+                    <div class="hand vertical" id="firstBotCardsDiv"></div>
+                </div>
+
+
+                <div>
+                    <div id="currentGameSuit"></div>
+                    <div class="central-pile" id="centralPile"></div>
+                </div>
+
+                <div class="hand-container">
+                    <div class="player-name">Bot 3</div>
+                    <div class="hand vertical" id="thirdBotCardsDiv"></div>
+                </div>
+            </div>
+
+            <div class="hand-container">
+                <div class="player-name">Vous</div>
+                <div class="hand horizontal" id="playerCards"></div>
+            </div>
+        </div>
+
+        <div id="controls">
+            <button id="lieBtn">Crier au mensonge</button>
+            <button id="passBtn">Passer</button>
+        </div>
+
+        <div id="result"></div>
+
+        <script type="module">
+            import LiarGame from "../../js/games/liar/liarGame.js";
+            new LiarGame();
+        </script>
+    </body>
+</html>
