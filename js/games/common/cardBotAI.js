@@ -6,8 +6,5 @@ export default class CardBotAI {
         }
         this.cards = [];
     }
-
-    decideMove(gameState) {
-        throw new Error("Abstract method 'decideMove' must be implemented by subclass.");
-    }
+    
 }
