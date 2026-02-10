@@ -13,6 +13,7 @@ export default class LiarGame extends CardGame {
         this.gameStack = [];
         this.lastPlayedCard = null;
         this.result = '';
+        this.isRoundOver = false;
 
         /* ===== BOTS ===== */
         this.bots = [
@@ -29,13 +30,13 @@ export default class LiarGame extends CardGame {
         this.lieBtn = document.getElementById('lieBtn');
         this.passBtn = document.getElementById('passBtn');
         this.nextRoundBtn = document.getElementById('nextRoundBtn');
+
         this.nextRoundBtn.addEventListener('click', () => this.nextRound());
 
         this.init();
     }
 
     /* ================= INIT ================= */
-
     init() {
         this.cards = [];
         this.resultDiv.innerHTML = '';
@@ -54,6 +55,7 @@ export default class LiarGame extends CardGame {
     }
 
     nextRound() {
+        // Réinitialisation pour la manche suivante
         this.gameStack = [];
         this.currentGameSuit = null;
         this.lastPlayedCard = null;
@@ -61,6 +63,7 @@ export default class LiarGame extends CardGame {
         this.isWaitingForDecision = false;
         this.resultDiv.innerHTML = '';
         this.nextRoundBtn.style.display = 'none';
+        this.isRoundOver=false;
         this.updateUI();
     }
 
@@ -72,7 +75,6 @@ export default class LiarGame extends CardGame {
     }
 
     /* ================= UI ================= */
-
     updateUI() {
         this.renderShowedHandOnDiv(this.playerHand, this.playerCardsDiv);
         this.shouldMakePlayerCardsActivable(this.isPlayerTurn);
@@ -84,7 +86,7 @@ export default class LiarGame extends CardGame {
         this.gameColorNameDiv.innerHTML =
             this.currentGameSuit ?? 'Aucune couleur jouée';
 
-        if (this.gameStack.length <= 1) {
+        if (this.gameStack.length <= 1 || this.isRoundOver) {
             this.renderShowedHandOnDiv(this.gameStack, this.centralPileDiv);
         } else {
             this.renderHiddenHandOnDiv(this.gameStack, this.centralPileDiv);
@@ -110,7 +112,6 @@ export default class LiarGame extends CardGame {
     }
 
     /* ================= RENDER ================= */
-
     renderShowedHandOnDiv(hand, div) {
         this.renderHandOnDiv(hand, div, true);
     }
@@ -142,7 +143,6 @@ export default class LiarGame extends CardGame {
     }
 
     /* ================= FLOW DE JEU ================= */
-
     async playsWholeTurn(hand, card) {
         if (!this.isPlayerTurn) return;
 
@@ -151,6 +151,9 @@ export default class LiarGame extends CardGame {
 
         for (const bot of this.bots) {
             await this.manageBotsTurn(bot);
+            if (this.isRoundOver) {
+                break;
+            }
         }
 
         this.isPlayerTurn = true;
@@ -170,6 +173,7 @@ export default class LiarGame extends CardGame {
 
         if (decision === 'lie') {
             await this.manageRoundEnd(bot);
+            this.isRoundOver=true;
         }
     }
 
@@ -197,15 +201,15 @@ export default class LiarGame extends CardGame {
             this.result = 'Le bot mentait. Il ramasse.';
             bot.cards.push(...this.gameStack);
         }
+
         this.resultDiv.innerHTML = this.result;
-        this.renderShowedHandOnDiv(this.gameStack, this.centralPileDiv);
-        this.updateUI();
+
         this.nextRoundBtn.style.display = 'inline-flex';
         this.isPlayerTurn = false;
+        this.isWaitingForDecision = false;
     }
 
     /* ================= LOGIQUE DE CARTE ================= */
-
     playCard(hand, card) {
         if (!this.currentGameSuit) {
             this.currentGameSuit = card.suit;
