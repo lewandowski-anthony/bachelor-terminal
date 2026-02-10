@@ -6,14 +6,13 @@
         <style>
             body {
                 font-family: Arial, sans-serif;
-                text-align: center;
                 background: #2c3e50;
                 color: #ecf0f1;
                 margin: 0;
-                padding: 0;
                 height: 100vh;
                 display: flex;
                 flex-direction: column;
+                text-align: center;
             }
 
             #gameTable {
@@ -22,7 +21,6 @@
                 flex-direction: column;
                 justify-content: space-between;
                 align-items: center;
-                position: relative;
                 padding: 10px;
             }
 
@@ -34,13 +32,35 @@
                 flex: 1;
             }
 
+            /* === CONTENEURS === */
             .hand-container {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
             }
 
-            .hand, .central-pile {
+            .hand-container.side-left,
+            .hand-container.side-right {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .hand-container.side-left .player-name {
+                margin-left: 30px;
+            }
+
+            .hand-container.side-right .player-name {
+                margin-right: 30px;
+            }
+
+            .player-name {
+                font-weight: bold;
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+
+            /* === MAINS === */
+            .hand {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -50,22 +70,14 @@
                 flex-direction: row;
             }
 
-            .vertical .player-name {
-                font-weight: bold;
-                margin-bottom: 10px;
-                font-size: 16px;
-            }
-
-            .horizontal .player-name {
-                font-weight: bold;
-                margin-bottom: 10px;
-                font-size: 16px;
-            }
-
             .horizontal .card-img {
                 margin-left: -40px;
-                z-index: 1;
                 transition: transform 0.2s;
+            }
+
+            .card-img.disabled {
+                pointer-events: none;
+                opacity: 0.5;
             }
 
             #playerCards .card-img:hover,
@@ -79,18 +91,17 @@
 
             .vertical .card-img {
                 transform: rotate(-90deg);
-                transform-origin: top left;
+                transform-origin: center;
                 margin-top: -70px;
-                z-index: 1;
             }
 
+            /* === PILE CENTRALE === */
             .central-pile {
                 width: 150px;
                 height: 150px;
                 background: #34495e;
                 border-radius: 10px;
                 position: relative;
-                overflow: visible;
             }
 
             .central-pile .card-img {
@@ -99,14 +110,9 @@
                 left: 50%;
                 transform: translate(-50%, -50%);
                 margin: 0 !important;
-                z-index: 1;
-                width: 60px;
-                height: 90px;
-                border-radius: 5px;
-                box-shadow: 0 2px 5px rgba(0,0,0,1);
             }
 
-            /* Style général des cartes */
+            /* === CARTES === */
             .card-img {
                 width: 60px;
                 height: 90px;
@@ -114,7 +120,7 @@
                 box-shadow: 0 2px 5px rgba(0,0,0,0.5);
             }
 
-            /* Boutons */
+            /* === BOUTONS === */
             button {
                 margin: 5px;
                 padding: 10px 15px;
@@ -135,45 +141,55 @@
                 font-size: 18px;
                 font-weight: bold;
             }
-
         </style>
     </head>
+
     <body>
         <h1>Jeu du Menteur</h1>
 
         <div id="gameTable">
+
+            <!-- BOT HAUT -->
             <div class="hand-container">
                 <div class="player-name">Bot 2</div>
                 <div class="hand horizontal" id="secondBotCardsDiv"></div>
             </div>
 
             <div id="middleRow">
-                <div class="hand-container">
-                    <div class="player-name">Bot 1</div>
+
+                <!-- BOT GAUCHE -->
+                <div class="hand-container side-left">
                     <div class="hand vertical" id="firstBotCardsDiv"></div>
+                    <div class="player-name">Bot 1</div>
                 </div>
 
-
+                <!-- PILE CENTRALE -->
                 <div>
+                    <div id="gameResult"></div>
                     <div id="currentGameSuit"></div>
                     <div class="central-pile" id="centralPile"></div>
                 </div>
 
-                <div class="hand-container">
+                <!-- BOT DROITE -->
+                <div class="hand-container side-right">
                     <div class="player-name">Bot 3</div>
                     <div class="hand vertical" id="thirdBotCardsDiv"></div>
                 </div>
+
             </div>
 
+            <!-- JOUEUR -->
             <div class="hand-container">
                 <div class="player-name">Vous</div>
                 <div class="hand horizontal" id="playerCards"></div>
             </div>
+
         </div>
 
         <div id="controls">
             <button id="lieBtn">Crier au mensonge</button>
             <button id="passBtn">Passer</button>
+            <button id="nextRoundBtn" style="display:none;">Manche suivante</button>
         </div>
 
         <div id="result"></div>
@@ -182,5 +198,6 @@
             import LiarGame from "../../js/games/liar/liarGame.js";
             new LiarGame();
         </script>
+
     </body>
 </html>
