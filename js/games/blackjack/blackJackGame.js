@@ -1,19 +1,15 @@
 import { mediaList } from '../../data/medias.js';
-import Card from './card.js';
+import BlackJackCard from './blackJackCard.js';
+import CardGame from "../common/cardGame.js";
 
 const REQUIRED_VICTORY_NUMBER = 10;
 
-export default class Game {
+export default class BlackJackGame extends CardGame{
     constructor() {
-        this.suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
-        this.rank = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
-        this.cards = [];
-        this.playerHand = [];
+        super();
         this.dealerHand = [];
         this.isPlayerTurn = true;
-        this.isGameOver = false;
         this.result = '';
-        this.gameResult = '';
         this.playerVictories = 0;
         this.dealerVictories = 0;
         this.init();
@@ -23,7 +19,7 @@ export default class Game {
         this.cards = [];
         for (let s of this.suits) {
             for (let r of this.rank) {
-                this.cards.push(new Card(s, r));
+                this.cards.push(new BlackJackCard(s, r));
             }
         }
         this.shuffle();
@@ -34,17 +30,6 @@ export default class Game {
         this.result = '';
         this.dealInitialCards();
         this.updateUI();
-    }
-
-    shuffle() {
-        for (let i = this.cards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
-        }
-    }
-
-    drawCard(hand) {
-        hand.push(this.cards.pop());
     }
 
     dealInitialCards() {
@@ -106,7 +91,7 @@ export default class Game {
 
         const playerCardsDiv = document.getElementById('playerCards');
         const dealerCardsDiv = document.getElementById('dealerCards');
-        const CARD_BACK = '../../assets/games/blackjack/cards/back.svg';
+        const CARD_BACK = '../../assets/games/cards/back.svg';
 
         const toggleElement = (id, show) => {
             const el = document.getElementById(id);
@@ -146,7 +131,7 @@ export default class Game {
                 this.dealerVictories = 0;
                 let tldFile = mediaList.filter(e => e.name=='projet-secret.png')[0];
                 document.getElementById('gameWinner').style.color = playerWinsGame ? 'green' : 'red';
-                document.getElementById('gameWinner').textContent = playerWinsGame ? 
+                document.getElementById('gameWinner').textContent = playerWinsGame ?
                 `Player wins the game ! Password of ${tldFile.name} is ${atob(tldFile.password)}` :
                 `Dealer wins the game`;
             }

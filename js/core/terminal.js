@@ -40,7 +40,7 @@ const DOUBLE_TAB_THRESHOLD = 400; // ms
 // --- Maintenance settings
 const unlockDate = new Date('2026-02-28T00:00:00');
 let maintenanceInterval = null;
-let maintenanceBypassed = false;
+let maintenanceBypassed = true;
 
 // --- Display maintenance message if needed
 function showMaintenanceMessage() {
@@ -143,7 +143,7 @@ function initTerminal() {
         historyIndex = history.length;
 
         await commandRegistry.execute(input);
-      } 
+      }
       else if (USER_STATE.state === 'password') {
         const passwordInputResponse = handleAuthPasswordInput(input, numberOfAttempts);
         numberOfAttempts = passwordInputResponse.numberOfAttempts;
@@ -187,7 +187,7 @@ function initTerminal() {
         parts[parts.length - 1] = options[0];
         input = parts.join(' ') + ' ';
         term.write('\x1b[2K\r' + getPrompt() + input);
-      } 
+      }
       else if (options.length > 1) {
         if (now - lastTabTime < DOUBLE_TAB_THRESHOLD) {
           term.write('\r\n' + options.join('  ') + '\r\n' + getPrompt() + input);

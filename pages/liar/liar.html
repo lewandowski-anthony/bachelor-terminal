@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Liar Game</title>
+        <link rel="stylesheet" href="../../css/games/liar/liar.css">
+    </head>
+
+    <body>
+        <h1>Liar Game</h1>
+
+        <div id="gameTable">
+
+            <!-- BOT HAUT -->
+            <div class="hand-container">
+                <div class="player-name" id="bot2-name">Bot 2</div>
+                <div class="hand horizontal" id="secondBotCardsDiv"></div>
+            </div>
+
+            <div id="middleRow">
+
+                <!-- BOT GAUCHE -->
+                <div class="hand-container side-left">
+                    <div class="hand vertical" id="firstBotCardsDiv"></div>
+                    <div class="player-name" id="bot1-name">Bot 1</div>
+                </div>
+
+                <!-- PILE CENTRALE -->
+                <div class="central-container">
+                    <div>
+                        <div id="gameResult"></div>
+                        <div id="currentGameSuit"></div>
+                    </div>
+                    <div class="central-pile" id="centralPile"></div>
+                </div>
+
+                <!-- BOT DROITE -->
+                <div class="hand-container side-right">
+                    <div class="player-name" id="bot3-name">Bot 3</div>
+                    <div class="hand vertical" id="thirdBotCardsDiv"></div>
+                </div>
+
+            </div>
+
+            <!-- JOUEUR -->
+            <div class="hand-container">
+                <div class="player-name">You</div>
+                <div class="hand horizontal" id="playerCards"></div>
+            </div>
+
+        </div>
+
+        <div id="controls">
+            <button id="lieBtn">Accuse last player of lying</button>
+            <button id="passBtn">Pass</button>
+            <button id="nextRoundBtn" style="display:none;">Next Round</button>
+            <button id="newGameBtn" style="display:none;">New Game</button>
+        </div>
+
+        <div id="result"></div>
+
+        <script type="module">
+            import LiarGame from "../../js/games/liar/liarGame.js";
+            new LiarGame();
+        </script>
+
+    </body>
+</html>

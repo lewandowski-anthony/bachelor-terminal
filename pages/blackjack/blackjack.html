@@ -41,9 +41,9 @@
 
 
     <script type="module">
-        import Game from '../../js/games/blackjack/game.js';
+        import BlackJackGame from '../../js/games/blackjack/blackJackGame.js';
 
-        const game = new Game();
+        const game = new BlackJackGame();
 
         document.getElementById('hitBtn').onclick = () => game.hit();
         document.getElementById('standBtn').onclick = () => game.stand();

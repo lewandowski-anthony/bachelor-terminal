@@ -1,0 +1,145 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #2c3e50;
+    color: #ecf0f1;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+#gameTable {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+#middleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+}
+
+.hand-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hand-container.side-left,
+.hand-container.side-right {
+    flex-direction: row;
+    align-items: center;
+}
+
+.hand-container.side-left .player-name {
+    margin-left: 30px;
+}
+
+.hand-container.side-right .player-name {
+    margin-right: 30px;
+}
+
+.player-name {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.hand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.horizontal {
+    flex-direction: row;
+}
+
+.horizontal .card-img {
+    margin-left: -40px;
+    transition: transform 0.2s;
+}
+
+.card-img.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+#playerCards .card-img:hover,
+#playerCards .card-img:active {
+    transform: translateY(-10px);
+}
+
+.vertical {
+    flex-direction: column;
+}
+
+.vertical .card-img {
+    transform: rotate(-90deg);
+    transform-origin: center;
+    margin-top: -70px;
+}
+
+.central-pile {
+    width: 150px;
+    height: 150px;
+    background: #34495e;
+    border-radius: 10px;
+    position: relative;
+}
+
+.central-pile .card-img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 !important;
+}
+
+.card-img {
+    width: 60px;
+    height: 90px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+button {
+    margin: 5px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #3498db;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+#result {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.central-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+}
+
+.central-container > div {
+    text-align: center;
+    margin-bottom: 5px;
+}
