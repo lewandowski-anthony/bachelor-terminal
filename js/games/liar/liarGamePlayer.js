@@ -2,9 +2,10 @@ import CardPlayer from '../common/cardPlayer.js';
 
 export default class LiarGameBotAI extends CardPlayer {
 
-    constructor(botCardsDiv) {
+    constructor(playerCardDiv) {
         super();
-        this.botCardsDiv = botCardsDiv;
+        this.playerCardDiv = playerCardDiv;
+        this.isPlayerTurn = true;
     }
 
 }

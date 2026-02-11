@@ -1,19 +1,22 @@
 import CardGame from "../common/cardGame.js";
 import LiarCard from "./liarCard.js";
 import LiarGameBotAI from "./liarGameBotAI.js";
+import LiarGamePlayer from "./liarGamePlayer.js";
 
 export default class LiarGame extends CardGame {
     constructor() {
         super();
 
         /* ===== ÉTAT DU JEU ===== */
-        this.isPlayerTurn = true;
         this.isWaitingForDecision = false;
         this.currentGameSuit = null;
         this.gameStack = [];
         this.lastPlayedCard = null;
         this.result = '';
         this.isRoundOver = false;
+
+        /* ===== Player ===== */
+        this.player = new LiarGamePlayer(document.getElementById('playerCardsDiv'));
 
         /* ===== BOTS ===== */
         this.bots = [
@@ -45,8 +48,9 @@ export default class LiarGame extends CardGame {
         this.isGameOver=false;
         this.isRoundOver=false;
         this.isWaitingForDecision=false;
-        this.isPlayerTurn = true;
-        this.playerHand = [];
+        this.player.isPlayerTurn = true;
+        this.player.cards = [];
+        this.gameStack = [];
         this.bots.forEach(bot => bot.cards = []);
         this.newGameBtn.style.display = 'none';
 
@@ -68,7 +72,7 @@ export default class LiarGame extends CardGame {
         this.gameStack = [];
         this.currentGameSuit = null;
         this.lastPlayedCard = null;
-        this.isPlayerTurn = true;
+        this.player.isPlayerTurn = true;
         this.isWaitingForDecision = false;
         this.resultDiv.innerHTML = '';
         this.nextRoundBtn.style.display = 'none';
@@ -78,15 +82,15 @@ export default class LiarGame extends CardGame {
 
     dealInitialCards() {
         do {
-            this.drawCard(this.playerHand);
+            this.drawCard(this.player.cards);
             this.bots.forEach(bot => this.drawCard(bot.cards));
         } while (this.cards.length > 0);
     }
 
     /* ================= UI ================= */
     updateUI() {
-        this.renderShowedHandOnDiv(this.playerHand, this.playerCardsDiv);
-        this.shouldMakePlayerCardsActivable(this.isPlayerTurn);
+        this.renderShowedHandOnDiv(this.player.cards, this.playerCardsDiv);
+        this.shouldMakePlayerCardsActivable(this.player.isPlayerTurn);
 
         this.bots.forEach(bot =>
             this.renderHiddenHandOnDiv(bot.cards, bot.botCardsDiv)
@@ -153,9 +157,9 @@ export default class LiarGame extends CardGame {
 
     /* ================= FLOW DE JEU ================= */
     async playsWholeTurn(hand, card) {
-        if (!this.isPlayerTurn || this.isRoundOver) return;
+        if (!this.player.isPlayerTurn || this.isRoundOver) return;
 
-        this.isPlayerTurn = false;
+        this.player.isPlayerTurn = false;
         this.playCard(hand, card);
         this.checkGameOver();
 
@@ -166,7 +170,7 @@ export default class LiarGame extends CardGame {
 
         this.checkGameOver();
         if(!this.isGameOver) {
-            this.isPlayerTurn = !this.isRoundOver;
+            this.player.isPlayerTurn = !this.isRoundOver;
             this.updateUI();
         }
     }
@@ -211,7 +215,7 @@ export default class LiarGame extends CardGame {
     async manageRoundEnd(bot) {
         if (this.lastPlayedCard.suit === this.currentGameSuit) {
             this.result = 'Le bot disait la vérité. Vous ramassez.';
-            this.playerHand.push(...this.gameStack);
+            this.player.cards.push(...this.gameStack);
         } else {
             this.result = 'Le bot mentait. Il ramasse.';
             bot.cards.push(...this.gameStack);
@@ -219,14 +223,14 @@ export default class LiarGame extends CardGame {
 
         this.resultDiv.innerHTML = this.result;
         this.nextRoundBtn.style.display = 'inline-flex';
-        this.isPlayerTurn = false;
+        this.player.isPlayerTurn = false;
         this.isWaitingForDecision = false;
         this.isRoundOver = true;
     }
 
     /* ================= FIN DE JEU ================= */
     checkGameOver() {
-        if (this.playerHand.length === 0) {
+        if (this.player.cards.length === 0) {
             this.result = 'Félicitations ! Vous avez gagné la partie.';
             this.endGame();
         } else if (this.bots.some(bot => bot.cards.length === 0)) {
@@ -238,13 +242,13 @@ export default class LiarGame extends CardGame {
     endGame() {
         this.newGameBtn.style.display = 'inline-flex';
         this.isRoundOver = true;
-        this.isPlayerTurn = false;
+        this.player.isPlayerTurn = false;
         this.isWaitingForDecision = false;
         this.resultDiv.innerHTML = this.result;
         this.currentGameSuit.innerHTML= '';
         this.renderShowedHandOnDiv(this.gameStack, this.centralPileDiv);
         this.nextRoundBtn.style.display = 'inline-flex';
-        this.renderShowedHandOnDiv(this.playerHand);
+        this.renderShowedHandOnDiv(this.player.cards);
         this.bots.forEach(bot =>
             this.renderShowedHandOnDiv(bot.cards, bot.botCardsDiv)
         );
