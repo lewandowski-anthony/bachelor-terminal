@@ -30,8 +30,10 @@ export default class LiarGame extends CardGame {
         this.lieBtn = document.getElementById('lieBtn');
         this.passBtn = document.getElementById('passBtn');
         this.nextRoundBtn = document.getElementById('nextRoundBtn');
+        this.newGameBtn = document.getElementById('newGameBtn');
 
         this.nextRoundBtn.addEventListener('click', () => this.nextRound());
+        this.newGameBtn.addEventListener('click', () => this.init());
 
         this.init();
     }
@@ -40,6 +42,13 @@ export default class LiarGame extends CardGame {
     init() {
         this.cards = [];
         this.resultDiv.innerHTML = '';
+        this.isGameOver=false;
+        this.isRoundOver=false;
+        this.isWaitingForDecision=false;
+        this.isPlayerTurn = true;
+        this.playerHand = [];
+        this.bots.forEach(bot => bot.cards = []);
+        this.newGameBtn.style.display = 'none';
 
         for (let s of this.suits) {
             for (let r of this.rank) {
@@ -148,6 +157,7 @@ export default class LiarGame extends CardGame {
 
         this.isPlayerTurn = false;
         this.playCard(hand, card);
+        this.checkGameOver();
 
         for (const bot of this.bots) {
             await this.manageBotsTurn(bot);
@@ -155,9 +165,10 @@ export default class LiarGame extends CardGame {
         }
 
         this.checkGameOver();
-
-        this.isPlayerTurn = !this.isRoundOver;
-        this.updateUI();
+        if(!this.isGameOver) {
+            this.isPlayerTurn = !this.isRoundOver;
+            this.updateUI();
+        }
     }
 
     async manageBotsTurn(bot) {
@@ -218,19 +229,25 @@ export default class LiarGame extends CardGame {
         if (this.playerHand.length === 0) {
             this.result = 'Félicitations ! Vous avez gagné la partie.';
             this.endGame();
-        } else if (this.bots.every(bot => bot.cards.length === 0)) {
+        } else if (this.bots.some(bot => bot.cards.length === 0)) {
             this.result = 'Les bots ont gagné la partie !';
             this.endGame();
         }
     }
 
     endGame() {
+        this.newGameBtn.style.display = 'inline-flex';
         this.isRoundOver = true;
         this.isPlayerTurn = false;
         this.isWaitingForDecision = false;
         this.resultDiv.innerHTML = this.result;
+        this.currentGameSuit.innerHTML= '';
         this.renderShowedHandOnDiv(this.gameStack, this.centralPileDiv);
         this.nextRoundBtn.style.display = 'inline-flex';
+        this.renderShowedHandOnDiv(this.playerHand);
+        this.bots.forEach(bot =>
+            this.renderShowedHandOnDiv(bot.cards, bot.botCardsDiv)
+        );
     }
 
     /* ================= LOGIQUE DE CARTE ================= */
