@@ -72,7 +72,10 @@ export default class Game {
             if (e.code === 'KeyP') this.togglePause();
         });
 
-        this.canvas.addEventListener('click', () => this.bird.flap());
+        this.canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            this.bird.flap();
+        }, { passive: false });
     }
 
     createPauseButton() {
@@ -145,8 +148,10 @@ export default class Game {
         this.pipeSpawnTimer += delta;
         if (this.pipeSpawnTimer > this.pipeSpawnInterval) {
             this.pipeSpawnTimer = 0;
-            const gapSize = this.canvas.height * GAP_SIZE_RATIO;
-            const speed = this.canvas.width * PIPE_SPEED_RATIO;
+            const difficulty = Math.min(1 + this.score * 0.05, 2);
+
+            const gapSize = this.canvas.height * GAP_SIZE_RATIO / difficulty;
+            const speed = this.canvas.width * PIPE_SPEED_RATIO * difficulty;
             this.pipes.push(new Pipe(this.canvas, gapSize, speed));
         }
 
@@ -170,6 +175,11 @@ export default class Game {
     gameOver() {
         if (this.isGameOver) return;
         this.isGameOver = true;
+
+        setTimeout(() => {
+            this.stop();
+        }, 300);
+
         this.stop();
         this.isPause = false;
 

@@ -19,7 +19,7 @@ export default class Pipe {
     }
 
     update(delta) {
-        this.x -= this.speed * (delta / SINGLE_FRAME_DURATION); 
+        this.x -= this.speed * (delta / SINGLE_FRAME_DURATION);
     }
 
     draw() {
@@ -54,10 +54,12 @@ export default class Pipe {
     }
 
     isCollidingWith(bird) {
-        const birdLeft = bird.xPosition;
-        const birdRight = bird.xPosition + bird.width;
-        const birdTop = bird.yPosition;
-        const birdBottom = bird.yPosition + bird.height;
+        const margin = bird.width * 0.25;
+
+        const birdLeft = bird.xPosition + margin;
+        const birdRight = bird.xPosition + bird.width - margin;
+        const birdTop = bird.yPosition + margin;
+        const birdBottom = bird.yPosition + bird.height - margin;
 
         const pipeLeft = this.x;
         const pipeRight = this.x + this.width;
