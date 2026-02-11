@@ -11,8 +11,6 @@ export default class LiarGameBotAI extends LiarGamePlayer {
 
     chooseCardsToPlay(currentRank, cardsPlayedThisRound) {
         const lieChance = this.calculateLyingChances(cardsPlayedThisRound);
-        this.cards.forEach(card => console.log(card.toString()))
-        console.log(`Bot ${this.playerName} has a ${Math.round(lieChance * 100)}% chance to lie this turn.`);
         const willLieThisTurn = Math.random() < lieChance;
 
         let possibleCards = this.cards.filter(card => {

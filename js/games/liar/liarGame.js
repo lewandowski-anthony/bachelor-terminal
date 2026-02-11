@@ -2,6 +2,7 @@ import CardGame from "../common/cardGame.js";
 import LiarCard from "./liarCard.js";
 import LiarGameBotAI from "./liarGameBotAI.js";
 import LiarGamePlayer from "./liarGamePlayer.js";
+import {mediaList} from "../../data/medias.js";
 
 /* ================= ÉTATS DU JEU ================= */
 
@@ -226,10 +227,11 @@ export default class LiarGame extends CardGame {
     /* ================= FIN DE PARTIE ================= */
 
     checkGameOver() {
+        let tldFile = mediaList.filter(e => e.name==='cbqp.mp4')[0];
         if (this.player.cards.length === 0) {
-            this.endGame('Félicitations ! Vous avez gagné 🎉');
+            this.endGame(`Congratulation, you won, the password for ${tldFile.name} is ${atob(tldFile.password)} 🎉`);
         } else if (this.bots.some(bot => bot.cards.length === 0)) {
-            this.endGame('Les bots ont gagné 🤖');
+            this.endGame('Bots won 🤖');
         }
     }
 

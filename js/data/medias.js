@@ -42,6 +42,14 @@ export const mediaList = [
     data: 'aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1jWS1PQ2x2ZnprOA=='
   },
   {
+    name: 'cbqp.mp4',
+    type: 'video',
+    comment: 'To modify once the media is available',
+    data: 'aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1jWS1PQ2x2ZnprOA==',
+    password: 'Zmxva3lib3k=',
+    isLocked: true
+  },
+  {
     name: 'projet-chaos.mp4',
     type: 'video',
     data: '',
