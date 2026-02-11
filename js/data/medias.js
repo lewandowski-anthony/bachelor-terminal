@@ -81,7 +81,7 @@ export const mediaList = [
     data: 'aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1uTWhNQU1lbVlvZw==',
   },
   {
-    name: 'tld-2.0.mp4',
+    name: 'tl-dos.mp4',
     type: 'video',
     data: 'aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj16bHp3cnQ3R19Xaw==',
     password: 'MTIvMDgvMjAyMw=='
