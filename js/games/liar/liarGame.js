@@ -3,30 +3,41 @@ import LiarCard from "./liarCard.js";
 import LiarGameBotAI from "./liarGameBotAI.js";
 import LiarGamePlayer from "./liarGamePlayer.js";
 
+/* ================= ÉTATS DU JEU ================= */
+
+const GAME_STATE = {
+    PLAYER_TURN: 'PLAYER_TURN',
+    BOT_TURN: 'BOT_TURN',
+    WAITING_DECISION: 'WAITING_DECISION',
+    ROUND_END: 'ROUND_END',
+    GAME_OVER: 'GAME_OVER'
+};
+
 export default class LiarGame extends CardGame {
     constructor() {
         super();
 
-        /* ===== ÉTAT DU JEU ===== */
-        this.isWaitingForDecision = false;
-        this.currentGameSuit = null;
+        /* ===== ÉTAT ===== */
+        this.state = GAME_STATE.PLAYER_TURN;
+        this.turnIndex = 0;
         this.gameStack = [];
+        this.currentGameSuit = null;
         this.lastPlayedCard = null;
         this.result = '';
-        this.isRoundOver = false;
 
-        /* ===== Player ===== */
-        this.player = new LiarGamePlayer(document.getElementById('playerCardsDiv'));
+        /* ===== PLAYER ===== */
+        this.player = new LiarGamePlayer("Player", document.getElementById('playerCards'));
 
         /* ===== BOTS ===== */
         this.bots = [
-            new LiarGameBotAI(document.getElementById('firstBotCardsDiv')),
-            new LiarGameBotAI(document.getElementById('secondBotCardsDiv')),
-            new LiarGameBotAI(document.getElementById('thirdBotCardsDiv'))
+            new LiarGameBotAI('Laurent', Math.random(), document.getElementById('firstBotCardsDiv')),
+            new LiarGameBotAI('Antoine', Math.random(), document.getElementById('secondBotCardsDiv')),
+            new LiarGameBotAI('Guillaume', Math.random(), document.getElementById('thirdBotCardsDiv'))
         ];
 
+        this.turnOrder = [this.player, ...this.bots];
+
         /* ===== DOM ===== */
-        this.playerCardsDiv = document.getElementById('playerCards');
         this.centralPileDiv = document.getElementById('centralPile');
         this.gameColorNameDiv = document.getElementById('currentGameSuit');
         this.resultDiv = document.getElementById('gameResult');
@@ -35,6 +46,10 @@ export default class LiarGame extends CardGame {
         this.nextRoundBtn = document.getElementById('nextRoundBtn');
         this.newGameBtn = document.getElementById('newGameBtn');
 
+        this.botOneNameDiv = document.getElementById('bot1-name');
+        this.botTwoNameDiv = document.getElementById('bot2-name');
+        this.botThreeNameDiv = document.getElementById('bot3-name');
+
         this.nextRoundBtn.addEventListener('click', () => this.nextRound());
         this.newGameBtn.addEventListener('click', () => this.init());
 
@@ -42,17 +57,31 @@ export default class LiarGame extends CardGame {
     }
 
     /* ================= INIT ================= */
+
     init() {
         this.cards = [];
-        this.resultDiv.innerHTML = '';
-        this.isGameOver=false;
-        this.isRoundOver=false;
-        this.isWaitingForDecision=false;
-        this.player.isPlayerTurn = true;
-        this.player.cards = [];
         this.gameStack = [];
-        this.bots.forEach(bot => bot.cards = []);
+        this.currentGameSuit = null;
+        this.lastPlayedCard = null;
+        this.result = '';
+
+        this.state = GAME_STATE.PLAYER_TURN;
+        this.turnIndex = 0;
+
+        this.player.cards = [];
+        this.player.numberOfCardsPlayedThisRound=0;
+        this.player.numberOfTimeHeGotCaugthLying=0;
+        this.bots.forEach(bot => {
+            bot.cards = [];
+            bot.numberOfTimeHeGotCaugthLying=0;
+        });
+
         this.newGameBtn.style.display = 'none';
+        this.nextRoundBtn.style.display = 'none';
+        this.resultDiv.innerHTML = '';
+        this.botOneNameDiv.innerHTML = this.bots[0].playerName;
+        this.botTwoNameDiv.innerHTML = this.bots[1].playerName;
+        this.botThreeNameDiv.innerHTML = this.bots[2].playerName;
 
         for (let s of this.suits) {
             for (let r of this.rank) {
@@ -63,68 +92,194 @@ export default class LiarGame extends CardGame {
         this.shuffle();
         this.dealInitialCards();
 
-        this.updateDecisionButtons();
+        this.updateUI();
+        this.nextTurn();
+    }
+
+    dealInitialCards() {
+        while (this.cards.length) {
+            this.drawCard(this.player.cards);
+            this.bots.forEach(bot => this.drawCard(bot.cards));
+        }
+    }
+
+    /* ================= TOURS ================= */
+
+    async nextTurn() {
+        if (this.state === GAME_STATE.GAME_OVER) return;
+
+        const current = this.turnOrder[this.turnIndex];
+
+        if (current === this.player) {
+            this.state = GAME_STATE.PLAYER_TURN;
+            this.player.isPlayerTurn = true;
+            this.updateUI();
+            return;
+        }
+
+        this.state = GAME_STATE.BOT_TURN;
+        await this.playBotTurn(current);
+    }
+
+    async playsWholeTurn(hand, card) {
+        if (this.state !== GAME_STATE.PLAYER_TURN) return;
+
+        this.player.isPlayerTurn = false;
+        this.lastPlayedCard = card;
+        this.player.numberOfCardsPlayedThisRound++;
+
+        this.playCard(hand, card);
+        const botAccused = await this.botsMayCallLieOnPlayer();
+        if (botAccused) return;
+        this.advanceTurn();
+    }
+
+    async playBotTurn(bot) {
+        const card = bot.chooseCardsToPlay(this.currentGameSuit, this.gameStack.length);
+        this.lastPlayedCard = card;
+
+        this.playCard(bot.cards, card);
+
+        this.state = GAME_STATE.WAITING_DECISION;
+        this.updateUI();
+
+        const decision = await this.waitForPlayerDecision();
+
+        if (decision === 'lie') {
+            this.resolveLie(bot, this.player);
+            return;
+        }
+
+        this.advanceTurn();
+    }
+
+    advanceTurn() {
+        this.checkGameOver();
+        if (this.state === GAME_STATE.GAME_OVER) return;
+
+        this.turnIndex = (this.turnIndex + 1) % this.turnOrder.length;
+        this.nextTurn();
+    }
+
+    /* ================= DÉCISION ================= */
+
+    async botsMayCallLieOnPlayer() {
+        if(this.player.numberOfCardsPlayedThisRound <= 1) return false;
+        for (const bot of this.bots) {
+            if (Math.random() < bot.botLieCallChance) {
+                await this.resolveLie(this.player, bot);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    waitForPlayerDecision() {
+        return new Promise(resolve => {
+            const cleanup = decision => {
+                this.lieBtn.removeEventListener('click', onLie);
+                this.passBtn.removeEventListener('click', onPass);
+                resolve(decision);
+            };
+
+            const onLie = () => cleanup('lie');
+            const onPass = () => cleanup('pass');
+
+            this.lieBtn.addEventListener('click', onLie);
+            this.passBtn.addEventListener('click', onPass);
+        });
+    }
+
+    resolveLie(accusedPlayer, attackingPlayer) {
+        this.state = GAME_STATE.ROUND_END;
+        this.result = `Player : ${attackingPlayer.playerName} accused ${accusedPlayer.playerName} of lying `;
+        if (this.lastPlayedCard.suit === this.currentGameSuit) {
+            this.result += `${accusedPlayer.playerName} was telling the truth ! ${attackingPlayer.playerName} picks up.`;
+            attackingPlayer.cards.push(...this.gameStack);
+        } else {
+            this.result += `${accusedPlayer.playerName} was lying! He picks up.`;
+            accusedPlayer.numberOfTimeHeGotCaugthLying++;
+            accusedPlayer.cards.push(...this.gameStack);
+        }
+
+        this.resultDiv.innerHTML = this.result;
+        this.nextRoundBtn.style.display = 'inline-flex';
         this.updateUI();
     }
 
     nextRound() {
-        // Réinitialisation pour la manche suivante
         this.gameStack = [];
         this.currentGameSuit = null;
         this.lastPlayedCard = null;
-        this.player.isPlayerTurn = true;
-        this.isWaitingForDecision = false;
         this.resultDiv.innerHTML = '';
+        this.player.numberOfCardsPlayedThisRound=0;
+
+        this.state = GAME_STATE.PLAYER_TURN;
+        this.turnIndex = 0;
+
         this.nextRoundBtn.style.display = 'none';
-        this.isRoundOver = false;
         this.updateUI();
+        this.nextTurn();
     }
 
-    dealInitialCards() {
-        do {
-            this.drawCard(this.player.cards);
-            this.bots.forEach(bot => this.drawCard(bot.cards));
-        } while (this.cards.length > 0);
+    /* ================= FIN DE PARTIE ================= */
+
+    checkGameOver() {
+        if (this.player.cards.length === 0) {
+            this.endGame('Félicitations ! Vous avez gagné 🎉');
+        } else if (this.bots.some(bot => bot.cards.length === 0)) {
+            this.endGame('Les bots ont gagné 🤖');
+        }
+    }
+
+    endGame(message) {
+        this.state = GAME_STATE.GAME_OVER;
+        this.resultDiv.innerHTML = message;
+        this.newGameBtn.style.display = 'inline-flex';
+
+        this.renderShowedHandOnDiv(this.gameStack, this.centralPileDiv);
+        this.renderShowedHandOnDiv(this.player.cards, this.player.playerCardDiv);
+        this.bots.forEach(bot =>
+            this.renderShowedHandOnDiv(bot.cards, bot.playerCardDiv)
+        );
     }
 
     /* ================= UI ================= */
+
     updateUI() {
-        this.renderShowedHandOnDiv(this.player.cards, this.playerCardsDiv);
-        this.shouldMakePlayerCardsActivable(this.player.isPlayerTurn);
+        this.renderShowedHandOnDiv(this.player.cards, this.player.playerCardDiv);
+        this.shouldMakePlayerCardsActivable(
+            this.state === GAME_STATE.PLAYER_TURN
+        );
 
         this.bots.forEach(bot =>
-            this.renderHiddenHandOnDiv(bot.cards, bot.botCardsDiv)
+            this.renderHiddenHandOnDiv(bot.cards, bot.playerCardDiv)
         );
 
         this.gameColorNameDiv.innerHTML =
-            this.currentGameSuit ?? 'Aucune couleur jouée';
+            this.currentGameSuit ?? 'Aucune couleur';
 
-        if (this.gameStack.length <= 1 || this.isRoundOver) {
+        this.renderHiddenHandOnDiv(this.gameStack, this.centralPileDiv);
+        if(this.state===GAME_STATE.ROUND_END) {
             this.renderShowedHandOnDiv(this.gameStack, this.centralPileDiv);
-        } else {
-            this.renderHiddenHandOnDiv(this.gameStack, this.centralPileDiv);
         }
 
-        this.updateDecisionButtons();
-    }
-
-    updateDecisionButtons() {
-        const display = this.isWaitingForDecision ? "inline-flex" : "none";
-        this.lieBtn.style.display = display;
-        this.passBtn.style.display = display;
+        const showDecision = this.state === GAME_STATE.WAITING_DECISION;
+        this.lieBtn.style.display = showDecision ? 'inline-flex' : 'none';
+        this.passBtn.style.display = showDecision ? 'inline-flex' : 'none';
     }
 
     shouldMakePlayerCardsActivable(active) {
-        this.playerCardsDiv
+        this.player.playerCardDiv
             .querySelectorAll('.card-img')
             .forEach(card =>
-                active
-                    ? card.classList.remove('disabled')
-                    : card.classList.add('disabled')
+                card.classList.toggle('disabled', !active)
             );
     }
 
     /* ================= RENDER ================= */
+
     renderShowedHandOnDiv(hand, div) {
         this.renderHandOnDiv(hand, div, true);
     }
@@ -134,13 +289,17 @@ export default class LiarGame extends CardGame {
     }
 
     renderHandOnDiv(hand, div, showCards = false) {
+        if (!div) return;
+
         div.innerHTML = '';
 
         hand.forEach((card, index) => {
             const img = document.createElement('img');
+
             img.src = showCards
                 ? card.cardImage.src
                 : '../../assets/games/cards/back.svg';
+
             img.alt = card.toString();
             img.className = 'card-img';
             img.style.zIndex = index;
@@ -148,6 +307,7 @@ export default class LiarGame extends CardGame {
             img.style.left = `calc(50% + ${index * 2}px)`;
 
             img.addEventListener('click', async () => {
+                if (hand !== this.player.cards) return;
                 await this.playsWholeTurn(hand, card);
             });
 
@@ -155,111 +315,17 @@ export default class LiarGame extends CardGame {
         });
     }
 
-    /* ================= FLOW DE JEU ================= */
-    async playsWholeTurn(hand, card) {
-        if (!this.player.isPlayerTurn || this.isRoundOver) return;
-
-        this.player.isPlayerTurn = false;
-        this.playCard(hand, card);
-        this.checkGameOver();
-
-        for (const bot of this.bots) {
-            await this.manageBotsTurn(bot);
-            if (this.isRoundOver) break;
-        }
-
-        this.checkGameOver();
-        if(!this.isGameOver) {
-            this.player.isPlayerTurn = !this.isRoundOver;
-            this.updateUI();
-        }
-    }
-
-    async manageBotsTurn(bot) {
-        if (this.isRoundOver) return;
-
-        const card = bot.cards[Math.floor(Math.random() * bot.cards.length)];
-        this.lastPlayedCard = card;
-        this.playCard(bot.cards, card);
-
-        this.isWaitingForDecision = true;
-        this.updateUI();
-        const decision = await this.waitForPlayerDecision();
-        this.isWaitingForDecision = false;
-        this.updateUI();
-
-        if (decision === 'lie') {
-            await this.manageRoundEnd(bot);
-            this.isRoundOver = true;
-        }
-
-        this.checkGameOver();
-    }
-
-    waitForPlayerDecision() {
-        return new Promise(resolve => {
-            const onLie = () => cleanup('lie');
-            const onPass = () => cleanup('pass');
-
-            const cleanup = decision => {
-                this.lieBtn.removeEventListener('click', onLie);
-                this.passBtn.removeEventListener('click', onPass);
-                resolve(decision);
-            };
-
-            this.lieBtn.addEventListener('click', onLie);
-            this.passBtn.addEventListener('click', onPass);
-        });
-    }
-
-    async manageRoundEnd(bot) {
-        if (this.lastPlayedCard.suit === this.currentGameSuit) {
-            this.result = 'Le bot disait la vérité. Vous ramassez.';
-            this.player.cards.push(...this.gameStack);
-        } else {
-            this.result = 'Le bot mentait. Il ramasse.';
-            bot.cards.push(...this.gameStack);
-        }
-
-        this.resultDiv.innerHTML = this.result;
-        this.nextRoundBtn.style.display = 'inline-flex';
-        this.player.isPlayerTurn = false;
-        this.isWaitingForDecision = false;
-        this.isRoundOver = true;
-    }
-
-    /* ================= FIN DE JEU ================= */
-    checkGameOver() {
-        if (this.player.cards.length === 0) {
-            this.result = 'Félicitations ! Vous avez gagné la partie.';
-            this.endGame();
-        } else if (this.bots.some(bot => bot.cards.length === 0)) {
-            this.result = 'Les bots ont gagné la partie !';
-            this.endGame();
-        }
-    }
-
-    endGame() {
-        this.newGameBtn.style.display = 'inline-flex';
-        this.isRoundOver = true;
-        this.player.isPlayerTurn = false;
-        this.isWaitingForDecision = false;
-        this.resultDiv.innerHTML = this.result;
-        this.currentGameSuit.innerHTML= '';
-        this.renderShowedHandOnDiv(this.gameStack, this.centralPileDiv);
-        this.nextRoundBtn.style.display = 'inline-flex';
-        this.renderShowedHandOnDiv(this.player.cards);
-        this.bots.forEach(bot =>
-            this.renderShowedHandOnDiv(bot.cards, bot.botCardsDiv)
-        );
-    }
-
     /* ================= LOGIQUE DE CARTE ================= */
+
     playCard(hand, card) {
-        if (!this.currentGameSuit) this.currentGameSuit = card.suit;
+        if (!this.currentGameSuit) {
+            this.currentGameSuit = card.suit;
+        }
 
         const index = hand.indexOf(card);
-        if (index > -1) hand.splice(index, 1);
+        if (index !== -1) {
+            hand.splice(index, 1);
+        }
 
         this.gameStack.push(card);
         this.updateUI();

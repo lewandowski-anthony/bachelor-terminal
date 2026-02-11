@@ -2,156 +2,18 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>Jeu du Menteur</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background: #2c3e50;
-                color: #ecf0f1;
-                margin: 0;
-                height: 100vh;
-                display: flex;
-                flex-direction: column;
-                text-align: center;
-            }
-
-            #gameTable {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px;
-            }
-
-            #middleRow {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                flex: 1;
-            }
-
-            /* === CONTENEURS === */
-            .hand-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .hand-container.side-left,
-            .hand-container.side-right {
-                flex-direction: row;
-                align-items: center;
-            }
-
-            .hand-container.side-left .player-name {
-                margin-left: 30px;
-            }
-
-            .hand-container.side-right .player-name {
-                margin-right: 30px;
-            }
-
-            .player-name {
-                font-weight: bold;
-                font-size: 16px;
-                margin-bottom: 10px;
-            }
-
-            /* === MAINS === */
-            .hand {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .horizontal {
-                flex-direction: row;
-            }
-
-            .horizontal .card-img {
-                margin-left: -40px;
-                transition: transform 0.2s;
-            }
-
-            .card-img.disabled {
-                pointer-events: none;
-                opacity: 0.5;
-            }
-
-            #playerCards .card-img:hover,
-            #playerCards .card-img:active {
-                transform: translateY(-10px);
-            }
-
-            .vertical {
-                flex-direction: column;
-            }
-
-            .vertical .card-img {
-                transform: rotate(-90deg);
-                transform-origin: center;
-                margin-top: -70px;
-            }
-
-            /* === PILE CENTRALE === */
-            .central-pile {
-                width: 150px;
-                height: 150px;
-                background: #34495e;
-                border-radius: 10px;
-                position: relative;
-            }
-
-            .central-pile .card-img {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                margin: 0 !important;
-            }
-
-            /* === CARTES === */
-            .card-img {
-                width: 60px;
-                height: 90px;
-                border-radius: 5px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            }
-
-            /* === BOUTONS === */
-            button {
-                margin: 5px;
-                padding: 10px 15px;
-                border: none;
-                border-radius: 5px;
-                background: #3498db;
-                color: white;
-                cursor: pointer;
-                font-size: 16px;
-            }
-
-            button:hover {
-                background: #2980b9;
-            }
-
-            #result {
-                margin-top: 20px;
-                font-size: 18px;
-                font-weight: bold;
-            }
-        </style>
+        <title>Liar Game</title>
+        <link rel="stylesheet" href="../../css/games/liar/liar.css">
     </head>
 
     <body>
-        <h1>Jeu du Menteur</h1>
+        <h1>Liar Game</h1>
 
         <div id="gameTable">
 
             <!-- BOT HAUT -->
             <div class="hand-container">
-                <div class="player-name">Bot 2</div>
+                <div class="player-name" id="bot2-name">Bot 2</div>
                 <div class="hand horizontal" id="secondBotCardsDiv"></div>
             </div>
 
@@ -160,19 +22,21 @@
                 <!-- BOT GAUCHE -->
                 <div class="hand-container side-left">
                     <div class="hand vertical" id="firstBotCardsDiv"></div>
-                    <div class="player-name">Bot 1</div>
+                    <div class="player-name" id="bot1-name">Bot 1</div>
                 </div>
 
                 <!-- PILE CENTRALE -->
-                <div>
-                    <div id="gameResult"></div>
-                    <div id="currentGameSuit"></div>
+                <div class="central-container">
+                    <div>
+                        <div id="gameResult"></div>
+                        <div id="currentGameSuit"></div>
+                    </div>
                     <div class="central-pile" id="centralPile"></div>
                 </div>
 
                 <!-- BOT DROITE -->
                 <div class="hand-container side-right">
-                    <div class="player-name">Bot 3</div>
+                    <div class="player-name" id="bot3-name">Bot 3</div>
                     <div class="hand vertical" id="thirdBotCardsDiv"></div>
                 </div>
 
@@ -180,16 +44,16 @@
 
             <!-- JOUEUR -->
             <div class="hand-container">
-                <div class="player-name">Vous</div>
+                <div class="player-name">You</div>
                 <div class="hand horizontal" id="playerCards"></div>
             </div>
 
         </div>
 
         <div id="controls">
-            <button id="lieBtn">Crier au mensonge</button>
-            <button id="passBtn">Passer</button>
-            <button id="nextRoundBtn" style="display:none;">Manche suivante</button>
+            <button id="lieBtn">Accuse last player of lying</button>
+            <button id="passBtn">Pass</button>
+            <button id="nextRoundBtn" style="display:none;">Next Round</button>
             <button id="newGameBtn" style="display:none;">New Game</button>
         </div>
 
