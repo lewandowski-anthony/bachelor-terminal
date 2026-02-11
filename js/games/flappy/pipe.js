@@ -3,19 +3,41 @@ import { SINGLE_FRAME_DURATION } from "./constants.js";
 export default class Pipe {
     constructor(canvas, gapSize, speed, lastGapY = null) {
         this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
+        this.ctx = canvas.getContext("2d");
+
         this.width = 50;
         this.speed = speed;
         this.gapSize = gapSize;
         this.x = canvas.width;
         this.passed = false;
+
         const minGapTop = canvas.height * 0.2;
         const maxGapTop = canvas.height * 0.75 - gapSize;
-        let gapY;
-        do {
-            gapY = Math.random() * (maxGapTop - minGapTop) + minGapTop;
-        } while (lastGapY !== null && Math.abs(gapY - lastGapY) > canvas.height * 0.75);
-        this.gapY = gapY;
+
+        const MAX_VERTICAL_SHIFT = canvas.height * 0.5;
+
+        this.gapY = this.computeGapY(
+            minGapTop,
+            maxGapTop,
+            lastGapY,
+            MAX_VERTICAL_SHIFT
+        );
+    }
+
+    computeGapY(minGapTop, maxGapTop, lastGapY, maxShift) {
+
+        if (lastGapY === null) {
+            return this.randomBetween(minGapTop, maxGapTop);
+        }
+
+        const minY = Math.max(minGapTop, lastGapY - maxShift);
+        const maxY = Math.min(maxGapTop, lastGapY + maxShift);
+
+        return this.randomBetween(minY, maxY);
+    }
+
+    randomBetween(min, max) {
+        return Math.random() * (max - min) + min;
     }
 
     update(delta) {
@@ -24,26 +46,43 @@ export default class Pipe {
 
     draw() {
         this.drawPipe(0, this.gapY, true);
-        this.drawPipe(this.gapY + this.gapSize, this.canvas.height - (this.gapY + this.gapSize), false);
+        this.drawPipe(
+            this.gapY + this.gapSize,
+            this.canvas.height - (this.gapY + this.gapSize),
+            false
+        );
     }
 
     drawPipe(y, height, top) {
         const ctx = this.ctx;
         const radius = 10 * (this.canvas.width / 360);
 
-        ctx.fillStyle = '#2ecc71';
+        ctx.fillStyle = "#2ecc71";
         ctx.fillRect(this.x, y + (top ? radius : 0), this.width, height - radius);
 
         ctx.beginPath();
         if (top) {
-            ctx.arc(this.x + this.width / 2, y + radius, this.width / 2, Math.PI, 0, false);
+            ctx.arc(
+                this.x + this.width / 2,
+                y + radius,
+                this.width / 2,
+                Math.PI,
+                0
+            );
         } else {
-            ctx.arc(this.x + this.width / 2, y + height - radius, this.width / 2, 0, Math.PI, false);
+            ctx.arc(
+                this.x + this.width / 2,
+                y + height - radius,
+                this.width / 2,
+                0,
+                Math.PI
+            );
         }
-        ctx.fillStyle = '#27ae60';
+
+        ctx.fillStyle = "#27ae60";
         ctx.fill();
 
-        ctx.strokeStyle = '#1e8449';
+        ctx.strokeStyle = "#1e8449";
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x, y + (top ? radius : 0), this.width, height - radius);
         ctx.stroke();

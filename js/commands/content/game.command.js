@@ -11,19 +11,19 @@ export default class GamesCommand extends AbstractListOpenCommand {
             id: 1,
             title: 'Flappy Ben',
             description: 'Help Ben (a.k.a Bounzi) fly through the pipes and beat the high score!',
-            link: './pages/flappy/flappy.html'
+            link: './pages/flappy/index.html'
         },
         {
             id: 2,
             title: 'Blackjack',
             description: 'Play a classic game of Blackjack against the dealer.',
-            link: './pages/blackjack/blackjack.html'
+            link: './pages/blackjack/index.html'
         },
         {
             id: 3,
             title: 'Liar Game',
             description: 'Test your deception skills in this thrilling game of lies and strategy.',
-            link: './pages/liar/liar.html'
+            link: './pages/liar/index.html'
         }
     ];
 

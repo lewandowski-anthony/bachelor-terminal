@@ -1,6 +1,6 @@
 import Bird from './bird.js';
 import Pipe from './pipe.js';
-import { USERS } from '../../models/user.js';
+import {USERS} from '../../models/user.js';
 import {
     BIRD_WIDTH,
     BIRD_HEIGHT,
@@ -25,6 +25,7 @@ export default class Game {
         this.score = 0;
         this.isPause = false;
         this.isGameOver = false;
+        this.lastGapY = null;
         this.loop = this.loop.bind(this);
         this.createPauseButton();
         this.background = new Image();
@@ -34,7 +35,7 @@ export default class Game {
         this.bgMusic.loop = true;
         this.bgMusic.volume = 0.7;
         this.bird = new Bird(0, 0, canvas);
-        this.highScore = 100;
+        this.highScore = 20;
     }
 
     start() {
@@ -56,16 +57,18 @@ export default class Game {
         this.lastTime = null;
         this.isPause = false;
         this.isGameOver = false;
+        this.lastGapY = null;
     }
 
     createControls() {
         const startAudio = () => {
-            if (this.bgMusic.paused) this.bgMusic.play().catch(() => { });
+            if (this.bgMusic.paused) this.bgMusic.play().catch(() => {
+            });
             document.removeEventListener('keydown', startAudio);
-            this.canvas.removeEventListener('click', startAudio);
+            this.canvas.removeEventListener('touchstart', startAudio);
         };
         document.addEventListener('keydown', startAudio);
-        this.canvas.addEventListener('click', startAudio);
+        this.canvas.addEventListener('touchstart', startAudio);
 
         document.addEventListener('keydown', e => {
             if (e.code === 'Space') this.bird.flap();
@@ -75,7 +78,7 @@ export default class Game {
         this.canvas.addEventListener('touchstart', e => {
             e.preventDefault();
             this.bird.flap();
-        }, { passive: false });
+        }, {passive: false});
     }
 
     createPauseButton() {
@@ -148,11 +151,18 @@ export default class Game {
         this.pipeSpawnTimer += delta;
         if (this.pipeSpawnTimer > this.pipeSpawnInterval) {
             this.pipeSpawnTimer = 0;
-            const difficulty = Math.min(1 + this.score * 0.05, 2);
+            const difficulty = Math.min(1 + this.score * 0.02, 3);
 
             const gapSize = this.canvas.height * GAP_SIZE_RATIO / difficulty;
             const speed = this.canvas.width * PIPE_SPEED_RATIO * difficulty;
-            this.pipes.push(new Pipe(this.canvas, gapSize, speed));
+            const pipe = new Pipe(
+                this.canvas,
+                gapSize,
+                speed,
+                this.lastGapY
+            );
+            this.lastGapY = pipe.gapY;
+            this.pipes.push(pipe);
         }
 
         this.pipes.forEach(pipe => {
@@ -160,7 +170,8 @@ export default class Game {
             if (!pipe.passed && pipe.x + pipe.width < this.bird.xPosition) {
                 pipe.passed = true;
                 this.score += 1;
-                this.pipePassedSound.play().catch(() => { });
+                this.pipePassedSound.play().catch(() => {
+                });
             }
         });
 
