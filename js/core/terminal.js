@@ -40,7 +40,7 @@ const DOUBLE_TAB_THRESHOLD = 400; // ms
 // --- Maintenance settings
 const unlockDate = new Date('2026-02-28T00:00:00');
 let maintenanceInterval = null;
-let maintenanceBypassed = true;
+let maintenanceBypassed = false;
 
 // --- Display maintenance message if needed
 function showMaintenanceMessage() {
