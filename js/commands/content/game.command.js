@@ -18,6 +18,12 @@ export default class GamesCommand extends AbstractListOpenCommand {
             title: 'Blackjack',
             description: 'Play a classic game of Blackjack against the dealer.',
             link: './pages/blackjack/blackjack.html'
+        },
+        {
+            id: 3,
+            title: 'Liar Game',
+            description: 'Test your deception skills in this thrilling game of lies and strategy.',
+            link: './pages/liar/liar.html'
         }
     ];
 
