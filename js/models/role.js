@@ -8,7 +8,7 @@ export default class Role {
 
 export const ROLES = {
     admin: new Role("admin", 0, ),
-    superuser: new Role("superuser", 1),
+    superuser: new Role("superuser", 1, ['evg']),
     user: new Role("user", 2, ['medias', 'games']),
     logmaster: new Role("logmaster", 3, ['logs']),
     guest: new Role("guest", 4, ['help', 'about', 'logout', 'clear', 'hints']),

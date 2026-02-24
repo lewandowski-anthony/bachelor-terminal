@@ -33,5 +33,35 @@ export const hintList = [
     id: 7,
     title: 'Comment ouvrir le média du projet cbqp ?',
     data: 'Il faudra être un très bon menteur pour trouver le mot de passe de ce media.',
+  },
+  {
+    id: 8,
+    title: 'Ouvrir le project_b-ltlpt.mp4',
+    data: 'Il faut jouer avec un oiseau très musclé',
+  },
+  {
+    id: 9,
+    title: 'Ouvrir le project_b-lc.mp4',
+    data: 'Faut y déménager pour la qualité de vie',
+  },
+  {
+    id: 10,
+    title: 'Ouvrir le project_b-bt.mp4',
+    data: 'Quel personnage de scooby doo est mentionné dans le project_b-lc.mp4',
+  },
+  {
+    id: 11,
+    title: 'Ouvrir le project_b-ban.mp4',
+    data: 'Personnages jaune',
+  },
+  {
+    id: 12,
+    title: 'Ouvrir le project_b-ban.mp4',
+    data: 'Personnages jaune',
+  },
+  {
+    id: 13,
+    title: 'Ouvrir le project_b-pl.mp4',
+    data: 'Qui va bien dans project_b-ban.mp4 (tout collé en minuscule)',
   }
 ];

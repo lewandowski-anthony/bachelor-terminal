@@ -12,10 +12,10 @@ export default class MediasCommand extends AbstractListOpenCommand {
   list() {
     const medias = [...mediaList].sort((a, b) => a.name.localeCompare(b.name)).map(m => {
       m.visibility = m.password ? 'Protected' : 'Public';
-      m.locked = m.isLocked ? 'Yes' : 'No';
+      m.unlockDate = m.unlockDate ? m.unlockDate : 'None';
       return m;
     });
-    const headers = ['Name', 'Type', 'Visibility', 'Locked'];
+    const headers = ['Name', 'Type', 'Visibility', 'UnlockDate'];
     renderTable(this.term, headers, medias);
   }
 
@@ -34,7 +34,7 @@ export default class MediasCommand extends AbstractListOpenCommand {
         return this.term.writeln('Wrong password!');
       }
     }
-    if (media.isLocked) {
+    if (Date.parse(media.unlockDate) > Date.now()) {
       return this.term.writeln(`This media is locked and cannot be opened for the moment.`);
     }
     this.term.writeln(`Opening ${media.name} (${media.type}) ...`);

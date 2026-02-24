@@ -12,6 +12,7 @@ import ClearCommand from '../system/clear.command.js';
 import {USER_STATE} from '../../models/userState.js';
 import SlapCommand from '../fun/slap.command.js';
 import GamesCommand from '../content/game.command.js';
+import EvgCommand from "../content/evg.command.js";
 
 
 export default class CommandRegistry {
@@ -26,6 +27,7 @@ export default class CommandRegistry {
         new SuitUpCommand(term),
         new HintsCommand(term),
         new MediasCommand(term),
+        new EvgCommand(term),
         new WhoAmICommand(term),
         new AboutCommand(term),
         new VersionCommand(term),

@@ -264,7 +264,7 @@ export default class Game {
                 if (this.score > this.highScore) {
                     wrapText(
                         ctx,
-                        `Congratulation on beating best score. Antoine's password : ${atob(USERS['antoine'].password)}`,
+                        `Congratulation on beating best score. Project B - LTLPT password is tortue2506`,
                         this.canvas.width / 2,
                         this.canvas.height / 4 + 100 * this.scale,
                         this.canvas.width * 0.8,
