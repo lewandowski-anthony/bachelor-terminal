@@ -93,7 +93,7 @@ export const mediaList = [
     type: 'video',
     data: 'aHR0cHM6Ly95b3V0dS5iZS8wUDdSWklWbzZvaw==',
     password: 'dmVsbw==',
-    unlockDate: '2026-04-10:00:00Z',
+    unlockDate: '2026-04-10T00:00:00Z',
   },
   {
     name: 'japd.mp4',
