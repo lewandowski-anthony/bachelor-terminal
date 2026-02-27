@@ -51,7 +51,7 @@ export const mediaList = [
     type: 'video',
     data: 'aHR0cHM6Ly95b3V0dS5iZS9ORW9VV05FZU9aRQ==',
     password: 'dG9ydHVlMjUwNg==',
-    unlockDate: '2026-02-28T00:00:00Z',
+    unlockDate: '2026-02-27T00:00:00Z',
   },
   {
     name: '02-project_b-lc.mp4',
@@ -82,6 +82,20 @@ export const mediaList = [
     unlockDate: '2026-03-27T00:00:00Z',
   },
   {
+    name: '06-project_b-tla.mp4',
+    type: 'video',
+    data: 'aHR0cHM6Ly95b3V0dS5iZS9NdlQ2RjZJQmxsRQ==',
+    password: 'Z2V0Mjc=',
+    unlockDate: '2026-04-03T00:00:00Z',
+  },
+  {
+    name: '07-project_b-lpt.mp4',
+    type: 'video',
+    data: 'aHR0cHM6Ly95b3V0dS5iZS8wUDdSWklWbzZvaw==',
+    password: 'dmVsbw==',
+    unlockDate: '2026-04-10:00:00Z',
+  },
+  {
     name: 'japd.mp4',
     type: 'video',
     data: 'aHR0cHM6Ly95b3V0dS5iZS9wOTNKRHQ2ZTBGWT9zaT1pWVZhTHVyZ3NkZzgwNko3JnQ9NjQ=',
@@ -96,6 +110,16 @@ export const mediaList = [
     type: 'video',
     data: 'aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj16bHp3cnQ3R19Xaw==',
     password: 'MTIvMDgvMjAyMw=='
+  },
+  {
+    name: 'making-of-tld.mp4',
+    type: 'video',
+    data: 'aHR0cHM6Ly95b3V0dS5iZS9wYzUwZ1FIeUFDSQ=='
+  },
+  {
+    name: 'mtv-sauce-algerino.mp4',
+    type: 'video',
+    data: 'aHR0cHM6Ly95b3V0dS5iZS9JUllIYmlDWjBiSQ=='
   }
 
 ];

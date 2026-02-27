@@ -38,7 +38,7 @@ let lastTabTime = 0;
 const DOUBLE_TAB_THRESHOLD = 400; // ms
 
 // --- Maintenance settings
-const unlockDate = new Date('2026-02-28T00:00:00');
+const unlockDate = new Date('2026-02-27T00:00:00');
 let maintenanceInterval = null;
 let maintenanceBypassed = false;
 

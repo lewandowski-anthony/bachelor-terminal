@@ -35,7 +35,7 @@ export default class Game {
         this.bgMusic.loop = true;
         this.bgMusic.volume = 0.7;
         this.bird = new Bird(0, 0, canvas);
-        this.highScore = 30;
+        this.highScore = 10;
     }
 
     start() {
