@@ -19,6 +19,7 @@ export default class HintsCommand extends AbstractListOpenCommand {
     this.term.writeln(`============ Opening hint with id: ${id} ============`);
     const hint = hintList.find(l => String(l.id) === String(id));
     if (!hint) return this.term.writeln('Hint not found');
+    this.term.writeln(hint.title)
     hint.data.split('\n').forEach(l => this.term.writeln(l));
     this.term.writeln(`============ Closing hint with id: ${id} ============`);
   }
