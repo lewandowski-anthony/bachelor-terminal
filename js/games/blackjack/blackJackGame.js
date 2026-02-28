@@ -129,7 +129,7 @@ export default class BlackJackGame extends CardGame{
             if (playerWinsGame || dealerWinsGame) {
                 this.playerVictories = 0;
                 this.dealerVictories = 0;
-                let tldFile = mediaList.filter(e => e.name=='projet-secret.png')[0];
+                let tldFile = mediaList.filter(e => e.name=='mtv-sauce-algerino.mp4')[0];
                 document.getElementById('gameWinner').style.color = playerWinsGame ? 'green' : 'red';
                 document.getElementById('gameWinner').textContent = playerWinsGame ?
                 `Player wins the game ! Password of ${tldFile.name} is ${atob(tldFile.password)}` :

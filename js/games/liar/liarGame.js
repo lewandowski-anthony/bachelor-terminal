@@ -227,7 +227,7 @@ export default class LiarGame extends CardGame {
     /* ================= FIN DE PARTIE ================= */
 
     checkGameOver() {
-        let tldFile = mediaList.filter(e => e.name==='cbqp.mp4')[0];
+        let tldFile = mediaList.filter(e => e.name==='making-of-tld.mp4')[0];
         if (this.player.cards.length === 0) {
             this.endGame(`Congratulation, you won, the password for ${tldFile.name} is ${atob(tldFile.password)} 🎉`);
         } else if (this.bots.some(bot => bot.cards.length === 0)) {

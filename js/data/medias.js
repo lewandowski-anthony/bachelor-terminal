@@ -12,8 +12,7 @@ export const mediaList = [
   {
     name: 'projet-secret.png',
     type: 'image',
-    data: 'aHR0cHM6Ly9pLmltZ3VyLmNvbS9EWFExWFRXLnBuZw==',
-    password: 'ZHVibGlu',
+    data: 'aHR0cHM6Ly9pLmltZ3VyLmNvbS9EWFExWFRXLnBuZw=='
   },
   {
     name: 'mandarine.png',
@@ -114,12 +113,14 @@ export const mediaList = [
   {
     name: 'making-of-tld.mp4',
     type: 'video',
-    data: 'aHR0cHM6Ly95b3V0dS5iZS9wYzUwZ1FIeUFDSQ=='
+    data: 'aHR0cHM6Ly95b3V0dS5iZS9wYzUwZ1FIeUFDSQ==',
+    password: "bHVjYWNh"
   },
   {
     name: 'mtv-sauce-algerino.mp4',
     type: 'video',
-    data: 'aHR0cHM6Ly95b3V0dS5iZS9JUllIYmlDWjBiSQ=='
+    data: 'aHR0cHM6Ly95b3V0dS5iZS9JUllIYmlDWjBiSQ==',
+    password: "YmVudGltZQ=="
   }
 
 ];
