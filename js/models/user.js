@@ -28,8 +28,8 @@ export const USERS = {
     benjamin: new User("benjamin", "BGBM", ROLES['user'].name, ['bzbomb', 'slap'], "Z29zc2lwZ2lybA=="),
     lucas: new User("lucas", "CalusLaTortue", ROLES['user'].name, ['suitup', 'slap'], 'Z3VhY2Ftb2xl'),
     franck: new User("franck", "FranckTorio", ROLES['guest'].name),
-    antoine: new User("antoine", "TLD", ROLES['superuser'].name, [], 'YW50b2luZTIwMjY='),
-    anthony: new User("anthony", "MrLew", ROLES['admin'].name, [], 'ZXZnMjAyNg=='),
+    antoine: new User("antoine", "TLD", ROLES['superuser'].name, [], 'YXhlbGxlYmVsbGVnb3NzZQ=='),
+    anthony: new User("anthony", "MrLew", ROLES['admin'].name, [], 'bW9uc2lldXJsZXc='),
     logmaster: new User("logmaster", "Log Master", ROLES['admin'].name, ['logs'], 'bGVzNmdlbW1lc2RlbGluZmluaQ=='),
     // Special users with no password but easter eggs
     manon: new User("manon", "Manon", ROLES['special'].name, []),
