@@ -62,6 +62,6 @@ export const hintList = [
   {
     id: 13,
     title: 'Ouvrir le project_b-pl.mp4',
-    data: 'Qui va bien dans project_b-ban.mp4 (tout collé en minuscule)',
+    data: 'Surnom de guillaume',
   }
 ];
