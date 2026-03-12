@@ -71,14 +71,14 @@ export const mediaList = [
     type: 'video',
     data: 'aHR0cHM6Ly95b3V0dS5iZS9VNWdVVWxQNGtUYw==',
     password: 'Z3JhYm91',
-    unlockDate: '2026-03-20T00:00:00Z',
+    unlockDate: '2026-03-13T00:00:00Z',
   },
   {
     name: '05-project_b-ban.mp4',
     type: 'video',
     data: 'aHR0cHM6Ly95b3V0dS5iZS9oWFdQU2ZOeVduaw==',
     password: 'bWluaW9u',
-    unlockDate: '2026-03-13T00:00:00Z',
+    unlockDate: '2026-03-20T00:00:00Z',
   },
   {
     name: '06-project_b-tla.mp4',
