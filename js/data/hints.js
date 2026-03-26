@@ -56,12 +56,42 @@ export const hintList = [
   },
   {
     id: 12,
-    title: 'Ouvrir le project_b-ban.mp4',
-    data: 'Personnages jaune',
+    title: 'Ouvrir le project_b-ft.mp4',
+    data: 'Nom de famille de franck',
   },
   {
     id: 13,
-    title: 'Ouvrir le project_b-pl.mp4',
-    data: 'Surnom de guillaume',
+    title: 'Ouvrir le project_b-cta.mp4',
+    data: 'Qui joue le personnage de franck dans les vidéos bloqués ?',
+  },
+  {
+    id: 13,
+    title: 'Ouvrir le project_b-cpc.mp4',
+    data: 'Animal totem de Lucas',
+  },
+  {
+    id: 14,
+    title: 'Ouvrir le project_b-slm.mp4',
+    data: 'Nom de la commande pour donner des baffes',
+  },
+  {
+    id: 15,
+    title: 'Ouvrir le project_b-tll.mp4',
+    data: 'Surnom de laurent quand il est fatigué',
+  },
+  {
+    id: 16,
+    title: 'Ouvrir le project_b-devg.mp4',
+    data: 'Lieu de destination evg Cassandra',
+  },
+  {
+    id: 16,
+    title: 'Ouvrir le project_b-tg.mp4',
+    data: 'Jeu de société de l\'équipe',
+  },
+  {
+    id: 17,
+    title: 'Ouvrir le project_b-le.mp4',
+    data: 'Ouverture connue aux echec, gentillet d\'un pays du sud de l\'Europe',
   }
 ];
